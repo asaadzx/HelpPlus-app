@@ -2,6 +2,7 @@
   "expo": {
     "name": "HelpPlus",
     "slug": "HelpPlus",
+    "owner": "asaadzein",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,7 +10,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.helpplus.app"
     },
     "android": {
       "package": "com.helpplus.app",
@@ -45,6 +47,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d3a5d41c-7687-4a2b-ae99-0fcaada35836"
+      },
+      "router": {}
     }
   }
 }
