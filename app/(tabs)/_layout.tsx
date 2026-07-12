@@ -1,33 +1,58 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
-
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '../../src/context/ThemeContext';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { colors } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
+        headerStyle: { backgroundColor: colors.headerBg },
+        headerTintColor: colors.headerText,
+        headerTitleStyle: { fontFamily: 'Tajawal_700Bold', fontSize: 18 },
+        tabBarStyle: {
+          backgroundColor: colors.white,
+          borderTopColor: colors.border,
+        },
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.muted,
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'الرئيسية',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="talk"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'اكتب لتتحدث',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="chatbubble-ellipses" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="entertainment"
+        options={{
+          title: 'الترفيه',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="play-circle-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'الإعدادات',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>

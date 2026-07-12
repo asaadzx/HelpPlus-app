@@ -1,50 +1,80 @@
-# Welcome to your Expo app 👋
+# معًا (HelpPlus)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An assistive communication app for stroke patients, built with Expo + React Native + React Native Paper.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Smart Dashboard** — 2-column tile grid with instant Arabic TTS on tap
+- **Quick Actions** — yes/no/thanks/help buttons for instant communication
+- **Type-to-Talk** — free typing with auto-speak on spacebar + quick phrase pills
+- **Custom Tiles** — create your own communication cards (Arabic + English, icon, color)
+- **Manage Tiles** — view and delete custom tiles, defaults are locked
+- **Entertainment Hub** — RSS news reader + Arabic trivia game
+- **Dark / Light Mode** — full theme toggle persisted to AsyncStorage
+- **Auto-Speak Delay** — configurable 10ms–500ms delay for TTS
+- **Profile** — login/logout + profile image picker
+- **Pull-to-Refresh** — refresh tiles, news, and settings by pulling down
+- **News Caching** — RSS feeds cached for instant display, background refresh
 
-   ```bash
-   npm install
-   ```
+## Screens
 
-2. Start the app
+| Screen | Description |
+|--------|-------------|
+| الرئيسية | Tile grid + quick action ribbon |
+| اكتب لتتحدث | Free typing with auto-speak |
+| الترفيه | RSS news + trivia game |
+| الإعدادات | Login, theme, RSS feeds, tile management |
 
-   ```bash
-   npx expo start
-   ```
+## Tech Stack
 
-In the output, you'll find options to open the app in a
+- Expo SDK 54 + React Native 0.81
+- React Native Paper (Material Design 3)
+- expo-router (file-based navigation)
+- expo-speech (Arabic TTS)
+- expo-av, expo-sqlite, expo-image-picker
+- AsyncStorage (persistence)
+- Tajawal (Arabic) + Fredoka (English) fonts
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Getting Started
 
 ```bash
-npm run reset-project
+# Install dependencies
+npm install
+
+# Start development server
+npx expo start
+
+# Run on Android (USB)
+adb reverse tcp:8081 tcp:8081
+npx expo start --android
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Project Structure
 
-## Learn more
+```
+app/
+  (tabs)/
+    _layout.tsx          # Bottom tab navigator
+    index.tsx            # Home — tile grid
+    talk.tsx             # Type-to-Talk
+    entertainment.tsx    # News + trivia
+    settings.tsx         # Settings + auth
+  add-tile.tsx           # Create custom tile
+  manage-tiles.tsx       # Delete custom tiles
+  _layout.tsx            # Root layout + providers
+src/
+  context/
+    ThemeContext.tsx      # Theme + auth + settings state
+constants/
+  theme.ts               # Colors, fonts, Paper MD3 theme
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Roadmap
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [ ] Smart Predictive AI Suggestion Bar
+- [ ] Emergency SOS Trigger (shake/volume)
+- [ ] Google Play Store release
+- [ ] F-Droid open-source distribution
+- [ ] SQLite-backed tile storage
+- [ ] Real backend auth
+- [ ] Caregiver dashboard
