@@ -2,8 +2,6 @@
 
 An assistive communication app for stroke patients, built with Expo + React Native + React Native Paper.
 
-![Home Dashboard](assets/screenshots/home-dashboard.png)
-
 ---
 
 ## About
