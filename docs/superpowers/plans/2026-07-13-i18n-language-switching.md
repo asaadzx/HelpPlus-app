@@ -1,6 +1,6 @@
 # i18n Language Switching & Testing Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add Arabic/English language switching with RTL/LTR layout, bilingual tiles, TTS language support, and Jest testing infrastructure.
 
@@ -28,20 +28,20 @@
 **Interfaces:**
 - Produces: `npm test` script, Jest configuration
 
-- [ ] **Step 1: Install testing dependencies**
+- [x] **Step 1: Install testing dependencies**
 
 ```bash
 npx expo install jest-expo @testing-library/react-native @testing-library/jest-native
 ```
 
-- [ ] **Step 2: Add test script to package.json**
+- [x] **Step 2: Add test script to package.json**
 
 In `package.json`, add to `"scripts"`:
 ```json
 "test": "jest"
 ```
 
-- [ ] **Step 3: Create jest.config.js**
+- [x] **Step 3: Create jest.config.js**
 
 ```js
 module.exports = {
@@ -53,12 +53,12 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 4: Verify Jest runs**
+- [x] **Step 4: Verify Jest runs**
 
 Run: `npx jest --passWithNoTests`
 Expected: No tests found, exits cleanly
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add package.json jest.config.js package-lock.json
@@ -76,7 +76,7 @@ git commit -m "chore: add Jest testing infrastructure with jest-expo"
 **Interfaces:**
 - Produces: Translation dictionaries consumed by LanguageContext `t()` function
 
-- [ ] **Step 1: Create Arabic translations**
+- [x] **Step 1: Create Arabic translations**
 
 Create `src/i18n/ar.json`:
 
@@ -165,7 +165,7 @@ Create `src/i18n/ar.json`:
 }
 ```
 
-- [ ] **Step 2: Create English translations**
+- [x] **Step 2: Create English translations**
 
 Create `src/i18n/en.json`:
 
@@ -254,7 +254,7 @@ Create `src/i18n/en.json`:
 }
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/i18n/
@@ -273,7 +273,7 @@ git commit -m "feat: add Arabic and English translation JSON files"
 - Produces: `LanguageProvider`, `useLanguage()` hook with `{ language, setLanguage, t, isRTL }`
 - Consumes: `ar.json`, `en.json` translations
 
-- [ ] **Step 1: Add Language type to src/types/index.ts**
+- [x] **Step 1: Add Language type to src/types/index.ts**
 
 Add to the top of `src/types/index.ts`:
 
@@ -281,7 +281,7 @@ Add to the top of `src/types/index.ts`:
 export type Language = 'ar' | 'en';
 ```
 
-- [ ] **Step 2: Create LanguageContext**
+- [x] **Step 2: Create LanguageContext**
 
 Create `src/i18n/index.ts`:
 
@@ -352,12 +352,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 export const useLanguage = () => useContext(LanguageContext);
 ```
 
-- [ ] **Step 3: Verify TypeScript compiles**
+- [x] **Step 3: Verify TypeScript compiles**
 
 Run: `npx tsc --noEmit`
 Expected: No errors
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/types/index.ts src/i18n/index.ts
@@ -374,7 +374,7 @@ git commit -m "feat: add LanguageContext with t() function and RTL support"
 **Interfaces:**
 - Consumes: `LanguageProvider` from `src/i18n`
 
-- [ ] **Step 1: Wrap app with LanguageProvider**
+- [x] **Step 1: Wrap app with LanguageProvider**
 
 In `app/_layout.tsx`, add import and wrap the provider tree:
 
@@ -398,12 +398,12 @@ export default function RootLayout() {
 }
 ```
 
-- [ ] **Step 2: Verify TypeScript compiles**
+- [x] **Step 2: Verify TypeScript compiles**
 
 Run: `npx tsc --noEmit`
 Expected: No errors
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add app/_layout.tsx
@@ -420,7 +420,7 @@ git commit -m "feat: integrate LanguageProvider into app root layout"
 **Interfaces:**
 - Consumes: `useLanguage()` from `src/i18n`, `Language` type
 
-- [ ] **Step 1: Add language selector above login gate**
+- [x] **Step 1: Add language selector above login gate**
 
 In `app/(tabs)/settings.tsx`, add imports:
 
@@ -493,7 +493,7 @@ if (!loggedIn) {
 }
 ```
 
-- [ ] **Step 2: Add LanguageSelector component**
+- [x] **Step 2: Add LanguageSelector component**
 
 Add this component inside `settings.tsx` (before the default export):
 
@@ -569,7 +569,7 @@ Add the `Menu` import:
 import { TextInput, Button, Switch, Card, Text, Avatar, Chip, IconButton, Surface, Menu } from 'react-native-paper';
 ```
 
-- [ ] **Step 3: Add languageRow and languageBtn styles**
+- [x] **Step 3: Add languageRow and languageBtn styles**
 
 In the `styles` object in `settings.tsx`, add:
 
@@ -587,7 +587,7 @@ languageBtn: {
 },
 ```
 
-- [ ] **Step 4: Replace all hardcoded Arabic strings in settings with t() calls**
+- [x] **Step 4: Replace all hardcoded Arabic strings in settings with t() calls**
 
 Replace each hardcoded string with its `t()` equivalent:
 - `'تسجيل الدخول'` → `t('settings.login')`
@@ -604,12 +604,12 @@ Replace each hardcoded string with its `t()` equivalent:
 - `'أضف رابط مخصص:'` → `t('settings.addCustomLink')`
 - `'تسجيل الخروج'` → `t('settings.logout')`
 
-- [ ] **Step 5: Verify TypeScript compiles**
+- [x] **Step 5: Verify TypeScript compiles**
 
 Run: `npx tsc --noEmit`
 Expected: No errors
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add app/(tabs)/settings.tsx
@@ -627,7 +627,7 @@ git commit -m "feat: add language selector to settings, translate all settings s
 **Interfaces:**
 - Consumes: `useLanguage()` from `src/i18n`
 
-- [ ] **Step 1: Translate tab names in _layout.tsx**
+- [x] **Step 1: Translate tab names in _layout.tsx**
 
 In `app/(tabs)/_layout.tsx`, add:
 
@@ -647,7 +647,7 @@ Replace tab titles:
 - `title: 'الترفيه'` → `title: t('tabs.entertainment')`
 - `title: 'الإعدادات'` → `title: t('tabs.settings')`
 
-- [ ] **Step 2: Translate modal titles in root _layout.tsx**
+- [x] **Step 2: Translate modal titles in root _layout.tsx**
 
 In `app/_layout.tsx`, add:
 
@@ -665,12 +665,12 @@ Replace modal titles:
 - `title: 'إضافة كرت جديد'` → `title: t('layout.addTile')`
 - `title: 'إدارة الكروت'` → `title: t('layout.manageTiles')`
 
-- [ ] **Step 3: Verify TypeScript compiles**
+- [x] **Step 3: Verify TypeScript compiles**
 
 Run: `npx tsc --noEmit`
 Expected: No errors
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add app/(tabs)/_layout.tsx app/_layout.tsx
@@ -687,7 +687,7 @@ git commit -m "feat: translate tab names and modal titles"
 **Interfaces:**
 - Consumes: `useLanguage()` from `src/i18n`
 
-- [ ] **Step 1: Add language imports and destructuring**
+- [x] **Step 1: Add language imports and destructuring**
 
 In `app/(tabs)/index.tsx`:
 
@@ -701,7 +701,7 @@ Inside `SmartDashboard`:
 const { language, t, isRTL } = useLanguage();
 ```
 
-- [ ] **Step 2: Make tiles bilingual**
+- [x] **Step 2: Make tiles bilingual**
 
 In `renderTile`, replace the Text elements:
 
@@ -732,7 +732,7 @@ tileTextPrimary: { fontSize: 20, textAlign: 'center' },
 tileTextSecondary: { fontSize: 14, textAlign: 'center', marginTop: 4 },
 ```
 
-- [ ] **Step 3: Update TTS to use correct language**
+- [x] **Step 3: Update TTS to use correct language**
 
 In `onTilePress`:
 
@@ -762,7 +762,7 @@ Update the `TouchableRipple` `onPress`:
 onPress={() => onTilePress(item)}
 ```
 
-- [ ] **Step 4: Translate greeting and ribbon**
+- [x] **Step 4: Translate greeting and ribbon**
 
 Replace the greeting:
 
@@ -812,7 +812,7 @@ Update `QuickRibbon` calls to use translated labels and TTS:
 />
 ```
 
-- [ ] **Step 5: Translate "Add" button**
+- [x] **Step 5: Translate "Add" button**
 
 ```tsx
 <Text style={[styles.addCardText, { color: colors.primary, fontFamily: Fonts.arabic.medium }]}>
@@ -820,12 +820,12 @@ Update `QuickRibbon` calls to use translated labels and TTS:
 </Text>
 ```
 
-- [ ] **Step 6: Verify TypeScript compiles**
+- [x] **Step 6: Verify TypeScript compiles**
 
 Run: `npx tsc --noEmit`
 Expected: No errors
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add app/(tabs)/index.tsx
@@ -842,7 +842,7 @@ git commit -m "feat: bilingual tiles, translated greeting/ribbon, TTS language s
 **Interfaces:**
 - Consumes: `useLanguage()` from `src/i18n`
 
-- [ ] **Step 1: Add language imports**
+- [x] **Step 1: Add language imports**
 
 ```ts
 import { useLanguage } from '../../src/i18n';
@@ -854,7 +854,7 @@ Inside `TalkScreen`:
 const { language, t } = useLanguage();
 ```
 
-- [ ] **Step 2: Translate quick phrases**
+- [x] **Step 2: Translate quick phrases**
 
 Replace the hardcoded `QUICK_PHRASES` array with translations:
 
@@ -897,7 +897,7 @@ Update the chip rendering:
 ))}
 ```
 
-- [ ] **Step 3: Translate placeholder, buttons, and TTS**
+- [x] **Step 3: Translate placeholder, buttons, and TTS**
 
 Replace:
 - `placeholder="اكتب هنا..."` → `placeholder={t('talk.placeholder')}`
@@ -919,12 +919,12 @@ setTimeout(() => {
 }, autoSpeakDelay);
 ```
 
-- [ ] **Step 4: Verify TypeScript compiles**
+- [x] **Step 4: Verify TypeScript compiles**
 
 Run: `npx tsc --noEmit`
 Expected: No errors
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/(tabs)/talk.tsx
@@ -941,7 +941,7 @@ git commit -m "feat: translate talk screen, bilingual quick phrases, TTS languag
 **Interfaces:**
 - Consumes: `useLanguage()` from `src/i18n`
 
-- [ ] **Step 1: Add language imports**
+- [x] **Step 1: Add language imports**
 
 ```ts
 import { useLanguage } from '../../src/i18n';
@@ -955,7 +955,7 @@ const { language, t } = useLanguage();
 
 Pass `t` and `language` to `NewsTab` and `TriviaTab`.
 
-- [ ] **Step 2: Translate NewsTab**
+- [x] **Step 2: Translate NewsTab**
 
 In `NewsTab` component, add `t` and `language` props. Replace:
 - `آخر الأخبار 📰` → `{t('entertainment.latestNews')} 📰`
@@ -969,7 +969,7 @@ Update the speak button TTS:
 onPress={() => Speech.speak(`${item.title}. ${item.description}`, { language: language === 'ar' ? 'ar' : 'en', rate: 0.85 })}
 ```
 
-- [ ] **Step 3: Translate TriviaTab**
+- [x] **Step 3: Translate TriviaTab**
 
 In `TriviaTab` component, add `t` and `language` props. Replace:
 - `الألعاب الذهنية 🧠` → `{t('entertainment.trivia')} 🧠`
@@ -993,7 +993,7 @@ Update segmented buttons labels:
 - `الأخبار` → `{t('entertainment.news')}`
 - `الألعاب الذهنية` → `{t('entertainment.trivia')}`
 
-- [ ] **Step 4: Translate trivia questions**
+- [x] **Step 4: Translate trivia questions**
 
 The trivia questions in `TRIVIA_QUESTIONS` are hardcoded in Arabic. Update `src/data/defaults.ts` to include translation keys:
 
@@ -1019,12 +1019,12 @@ export interface TriviaQuestion {
 
 In the trivia rendering, use `language === 'ar' ? trivia.questionAr : trivia.questionEn` and same for options.
 
-- [ ] **Step 5: Verify TypeScript compiles**
+- [x] **Step 5: Verify TypeScript compiles**
 
 Run: `npx tsc --noEmit`
 Expected: No errors
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add app/(tabs)/entertainment.tsx src/data/defaults.ts src/types/index.ts
@@ -1042,7 +1042,7 @@ git commit -m "feat: translate entertainment screen, bilingual trivia questions"
 **Interfaces:**
 - Consumes: `useLanguage()` from `src/i18n`
 
-- [ ] **Step 1: Translate add-tile.tsx**
+- [x] **Step 1: Translate add-tile.tsx**
 
 Add `useLanguage` import and destructure `t` and `language`.
 
@@ -1062,7 +1062,7 @@ Update font families based on language:
 fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold
 ```
 
-- [ ] **Step 2: Translate manage-tiles.tsx**
+- [x] **Step 2: Translate manage-tiles.tsx**
 
 Add `useLanguage` import and destructure `t` and `language`.
 
@@ -1084,12 +1084,12 @@ Update bilingual tile display — show both `labelAr` and `labelEn` in the list:
 </Text>
 ```
 
-- [ ] **Step 3: Verify TypeScript compiles**
+- [x] **Step 3: Verify TypeScript compiles**
 
 Run: `npx tsc --noEmit`
 Expected: No errors
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add app/add-tile.tsx app/manage-tiles.tsx
@@ -1108,7 +1108,7 @@ git commit -m "feat: translate add-tile and manage-tiles screens"
 **Interfaces:**
 - Consumes: `isRTL` from `useLanguage()`
 
-- [ ] **Step 1: Fix hardcoded right/left in settings.tsx**
+- [x] **Step 1: Fix hardcoded right/left in settings.tsx**
 
 The `cameraBadge` uses `right: '35%'`. Replace with conditional:
 
@@ -1142,7 +1142,7 @@ Fix `settingValue` `marginLeft` → conditional:
 <Text style={[styles.settingValue, { color: colors.primary, fontFamily: Fonts.english.bold, marginLeft: isRTL ? 'auto' : undefined, marginRight: isRTL ? undefined : 'auto' }]}>
 ```
 
-- [ ] **Step 2: Fix textAlign in index.tsx**
+- [x] **Step 2: Fix textAlign in index.tsx**
 
 In `renderTile`, the `tileTextPrimary` and `tileTextSecondary` styles use `textAlign: 'center'` which is fine for both directions. No change needed.
 
@@ -1157,12 +1157,12 @@ greetingText: {
 
 Actually, greetings look fine centered or right-aligned in both languages. Keep as-is.
 
-- [ ] **Step 3: Verify TypeScript compiles**
+- [x] **Step 3: Verify TypeScript compiles**
 
 Run: `npx tsc --noEmit`
 Expected: No errors
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add app/(tabs)/settings.tsx app/(tabs)/index.tsx app/(tabs)/entertainment.tsx
@@ -1179,7 +1179,7 @@ git commit -m "fix: conditional RTL/LTR positioning for hardcoded right/left sty
 **Interfaces:**
 - Consumes: `LanguageProvider`, `useLanguage` from `src/i18n`
 
-- [ ] **Step 1: Create test file**
+- [x] **Step 1: Create test file**
 
 Create `src/i18n/__tests__/LanguageContext.test.tsx`:
 
@@ -1230,12 +1230,12 @@ describe('LanguageContext', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests**
+- [x] **Step 2: Run tests**
 
 Run: `npx jest src/i18n/__tests__/LanguageContext.test.tsx`
 Expected: All tests pass (may need to mock AsyncStorage)
 
-- [ ] **Step 3: Add AsyncStorage mock if needed**
+- [x] **Step 3: Add AsyncStorage mock if needed**
 
 If AsyncStorage errors occur, add mock at top of test file:
 
@@ -1245,12 +1245,12 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 ```
 
-- [ ] **Step 4: Run tests again**
+- [x] **Step 4: Run tests again**
 
 Run: `npx jest src/i18n/__tests__/LanguageContext.test.tsx`
 Expected: All tests pass
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/i18n/__tests__/
@@ -1267,7 +1267,7 @@ git commit -m "test: add LanguageContext tests"
 **Interfaces:**
 - Consumes: `SmartDashboard` component, `LanguageProvider`, `ThemeProvider`
 
-- [ ] **Step 1: Create test file**
+- [x] **Step 1: Create test file**
 
 Create `app/(tabs)/__tests__/index.test.tsx`:
 
@@ -1317,7 +1317,7 @@ describe('SmartDashboard', () => {
 });
 ```
 
-- [ ] **Step 2: Add necessary mocks**
+- [x] **Step 2: Add necessary mocks**
 
 Add at top of test file:
 
@@ -1336,12 +1336,12 @@ jest.mock('expo-router', () => ({
 }));
 ```
 
-- [ ] **Step 3: Run tests**
+- [x] **Step 3: Run tests**
 
 Run: `npx jest app/(tabs)/__tests__/index.test.tsx`
 Expected: All tests pass
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add app/(tabs)/__tests__/
@@ -1358,7 +1358,7 @@ git commit -m "test: add SmartDashboard tests for bilingual rendering"
 **Interfaces:**
 - Consumes: `SettingsScreen` component, `LanguageProvider`, `ThemeProvider`
 
-- [ ] **Step 1: Create test file**
+- [x] **Step 1: Create test file**
 
 Create `app/(tabs)/__tests__/settings.test.tsx`:
 
@@ -1393,7 +1393,7 @@ describe('SettingsScreen', () => {
 });
 ```
 
-- [ ] **Step 2: Add mocks**
+- [x] **Step 2: Add mocks**
 
 Add at top:
 
@@ -1415,12 +1415,12 @@ jest.mock('expo-updates', () => ({
 }));
 ```
 
-- [ ] **Step 3: Run tests**
+- [x] **Step 3: Run tests**
 
 Run: `npx jest app/(tabs)/__tests__/settings.test.tsx`
 Expected: All tests pass
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add app/(tabs)/__tests__/settings.test.tsx
@@ -1437,25 +1437,34 @@ git commit -m "test: add Settings screen tests for language selector"
 **Interfaces:**
 - N/A
 
-- [ ] **Step 1: Run full typecheck**
+- [x] **Step 1: Run full typecheck**
 
 Run: `npx tsc --noEmit`
 Expected: No errors
 
-- [ ] **Step 2: Run full lint**
+- [x] **Step 2: Run full lint**
 
 Run: `npx expo lint`
 Expected: No errors
 
-- [ ] **Step 3: Run all tests**
+- [x] **Step 3: Run all tests**
 
 Run: `npx jest`
 Expected: All tests pass
 
-- [ ] **Step 4: Final commit**
+- [x] **Step 4: Final commit**
 
 ```bash
 git add -A
 git commit -m "chore: final cleanup and verification"
 git push
 ```
+
+## Status
+
+✅ **ALL 15 TASKS COMPLETE** — 2026-07-13
+
+- `npx tsc --noEmit`: clean
+- `npx expo lint`: 0 errors, 0 warnings
+- `npx jest`: 6/6 tests passing
+- All changes committed and pushed to GitHub
