@@ -1,3 +1,5 @@
+export type Language = 'ar' | 'en';
+
 export type IconProvider = 'Ionicons' | 'MaterialCommunityIcons';
 
 export interface PhraseCard {
@@ -22,7 +24,9 @@ export interface FeedItem {
 export interface TriviaQuestion {
   id: string;
   questionAr: string;
+  questionEn: string;
   options: string[];
+  optionsEn: string[];
   correctIndex: number;
 }
 
