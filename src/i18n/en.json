@@ -78,5 +78,7 @@
   "trivia.q5": "How many colors are in a rainbow?",
   "trivia.q6": "What is the fastest animal in the world?",
   "trivia.q7": "Which continent is Egypt on?",
-  "trivia.q8": "What is the largest ocean in the world?"
+  "trivia.q8": "What is the largest ocean in the world?",
+  "settings.supportTitle": "Support the Developer",
+  "settings.supportDesc": "If you find this app helpful, feel free to reach out or visit the developer's portfolio."
 }

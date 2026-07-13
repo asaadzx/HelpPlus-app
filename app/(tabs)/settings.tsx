@@ -5,6 +5,7 @@ import {
   View,
   RefreshControl,
   Alert,
+  Linking,
 } from 'react-native';
 import {
   TextInput,
@@ -468,6 +469,50 @@ export default function SettingsScreen() {
         </Card.Content>
       </Card>
 
+      <Card style={styles.sectionBox}>
+        <Card.Content>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="heart" size={22} color={colors.emergency} />
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
+              ]}
+            >
+              {t('settings.supportTitle')}
+            </Text>
+          </View>
+          <Text
+            style={[
+              styles.presetLabel,
+              { color: colors.muted, fontFamily: language === 'ar' ? Fonts.arabic.regular : Fonts.english.regular },
+            ]}
+          >
+            {t('settings.supportDesc')}
+          </Text>
+          <View style={styles.developerLinks}>
+            <Surface style={[styles.developerLink, { backgroundColor: colors.inputBg }]} elevation={0}>
+              <Ionicons name="globe-outline" size={20} color={colors.primary} />
+              <Text
+                style={[styles.developerLinkText, { color: colors.text, fontFamily: Fonts.english.regular }]}
+                onPress={() => Linking.openURL('https://asaadzein.dev')}
+              >
+                asaadzein.dev
+              </Text>
+            </Surface>
+            <Surface style={[styles.developerLink, { backgroundColor: colors.inputBg }]} elevation={0}>
+              <Ionicons name="mail-outline" size={20} color={colors.primary} />
+              <Text
+                style={[styles.developerLinkText, { color: colors.text, fontFamily: Fonts.english.regular }]}
+                onPress={() => Linking.openURL('mailto:asaad.work2010@gmail.com')}
+              >
+                asaad.work2010@gmail.com
+              </Text>
+            </Surface>
+          </View>
+        </Card.Content>
+      </Card>
+
       <Surface style={styles.settingRow} elevation={1}>
         <View style={styles.settingLeft}>
           <Ionicons name="log-out-outline" size={22} color={colors.emergency} />
@@ -629,6 +674,15 @@ const styles = StyleSheet.create({
   customFeedRow: { flexDirection: 'row', gap: 8 },
   customFeedInput: { flex: 1 },
   addFeedBtn: { minWidth: 48 },
+  developerLinks: { gap: 10, marginTop: 8 },
+  developerLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+    borderRadius: 12,
+  },
+  developerLinkText: { fontSize: 15 },
   delayButtons: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   delayChip: {
     paddingHorizontal: 12,
