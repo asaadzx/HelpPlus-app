@@ -495,7 +495,7 @@ export default function SettingsScreen() {
               <Ionicons name="globe-outline" size={20} color={colors.primary} />
               <Text
                 style={[styles.developerLinkText, { color: colors.text, fontFamily: Fonts.english.regular }]}
-                onPress={() => Linking.openURL('https://asaadzein.dev')}
+                onPress={() => Linking.openURL('https://asaadzx.is-a.dev/')}
               >
                 asaadzein.dev
               </Text>
