@@ -20,8 +20,16 @@ const CARD_GAP = 10;
 const CARD_WIDTH = (width - GRID_PADDING * 2 - CARD_GAP * (COLUMN_COUNT - 1)) / COLUMN_COUNT;
 const CARD_HEIGHT = CARD_WIDTH * 1.05;
 
+function darkenColor(hex: string, factor = 0.4): string {
+  const h = hex.replace('#', '');
+  const r = Math.round(parseInt(h.substring(0, 2), 16) * (1 - factor));
+  const g = Math.round(parseInt(h.substring(2, 4), 16) * (1 - factor));
+  const b = Math.round(parseInt(h.substring(4, 6), 16) * (1 - factor));
+  return `rgb(${r},${g},${b})`;
+}
+
 export default function SmartDashboard() {
-  const { colors, user, autoSpeakDelay } = useTheme();
+  const { colors, user, autoSpeakDelay, isDark } = useTheme();
   const { language, t } = useLanguage();
   const router = useRouter();
   const params = useLocalSearchParams<{ newTile?: string }>();
@@ -81,7 +89,7 @@ export default function SmartDashboard() {
         style={styles.tileWrapper}
       >
         <Surface
-          style={[styles.tileCard, { backgroundColor: item.color }]}
+          style={[styles.tileCard, { backgroundColor: isDark ? darkenColor(item.color) : item.color }]}
           elevation={2}
         >
           <View style={styles.iconPlacement}>
