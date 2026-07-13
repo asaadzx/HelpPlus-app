@@ -226,7 +226,7 @@ export default function SettingsScreen() {
             icon="camera"
             size={12}
             iconColor={colors.white}
-            style={[styles.cameraBadge, { backgroundColor: colors.secondary }]}
+            style={[styles.cameraBadge, { backgroundColor: colors.secondary, ...(isRTL ? { right: '35%' } : { left: '35%' }) }]}
             onPress={pickImage}
           />
           <Text
@@ -282,7 +282,7 @@ export default function SettingsScreen() {
             <Text
               style={[
                 styles.settingValue,
-                { color: colors.primary, fontFamily: Fonts.english.bold },
+                { color: colors.primary, fontFamily: Fonts.english.bold, ...(isRTL ? { marginLeft: 'auto' } : { marginRight: 'auto' }) },
               ]}
             >
               {autoSpeakDelay}ms
@@ -377,7 +377,7 @@ export default function SettingsScreen() {
               <Text
                 style={[
                   styles.feedUrl,
-                  { color: colors.text, fontFamily: Fonts.english.regular },
+                  { color: colors.text, fontFamily: Fonts.english.regular, ...(isRTL ? { marginRight: 8 } : { marginLeft: 8 }) },
                 ]}
                 numberOfLines={1}
               >
