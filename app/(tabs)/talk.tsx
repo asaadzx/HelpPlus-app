@@ -4,24 +4,26 @@ import { TextInput, Button, Chip, Surface } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import { useTheme } from '../../src/context/ThemeContext';
+import { useLanguage } from '../../src/i18n';
 import { Fonts } from '../../constants/theme';
-
-const QUICK_PHRASES = [
-  { ar: 'ايوه', en: 'Yes' },
-  { ar: 'لأ', en: 'No' },
-  { ar: 'شكراً', en: 'Thanks' },
-  { ar: 'النجدة', en: 'Help' },
-  { ar: 'عايز مية', en: 'Water' },
-  { ar: 'تعبان', en: 'Tired' },
-];
 
 export default function TalkScreen() {
   const { colors, autoSpeakDelay } = useTheme();
+  const { language, t } = useLanguage();
   const [text, setText] = useState('');
+
+  const quickPhrases = [
+    t('talk.quickPhrases.yes'),
+    t('talk.quickPhrases.no'),
+    t('talk.quickPhrases.thanks'),
+    t('talk.quickPhrases.help'),
+    t('talk.quickPhrases.water'),
+    t('talk.quickPhrases.tired'),
+  ];
 
   const speak = () => {
     if (!text.trim()) return;
-    Speech.speak(text, { language: 'ar', pitch: 1.0, rate: 0.85 });
+    Speech.speak(text, { language: language === 'ar' ? 'ar' : 'en', pitch: 1.0, rate: 0.85 });
   };
 
   const handleTextChange = (value: string) => {
@@ -30,7 +32,7 @@ export default function TalkScreen() {
       const words = value.trim().split(' ');
       const lastWord = words[words.length - 1];
       setTimeout(() => {
-        Speech.speak(lastWord, { language: 'ar', pitch: 1.0, rate: 0.85 });
+        Speech.speak(lastWord, { language: language === 'ar' ? 'ar' : 'en', pitch: 1.0, rate: 0.85 });
       }, autoSpeakDelay);
     }
   };
@@ -43,19 +45,19 @@ export default function TalkScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.quickScroll}
         >
-          {QUICK_PHRASES.map((p, i) => (
+          {quickPhrases.map((phrase, i) => (
             <Chip
               key={i}
               onPress={() =>
-                setText((prev) => (prev ? `${prev} ${p.ar}` : p.ar))
+                setText((prev) => (prev ? `${prev} ${phrase}` : phrase))
               }
               style={styles.quickPill}
               textStyle={[
                 styles.quickPillText,
-                { color: colors.text, fontFamily: Fonts.arabic.medium },
+                { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
               ]}
             >
-              {p.ar}
+              {phrase}
             </Chip>
           ))}
         </ScrollView>
@@ -66,10 +68,10 @@ export default function TalkScreen() {
           mode="outlined"
           value={text}
           onChangeText={handleTextChange}
-          placeholder="اكتب هنا..."
+          placeholder={t('talk.placeholder')}
           multiline
           textAlignVertical="top"
-          style={[styles.textInput, { fontFamily: Fonts.arabic.medium }]}
+          style={[styles.textInput, { fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium }]}
           outlineColor={colors.border}
           activeOutlineColor={colors.primary}
           theme={{
@@ -88,10 +90,10 @@ export default function TalkScreen() {
           style={[styles.clearBtn, { borderColor: colors.border }]}
           labelStyle={[
             styles.clearBtnText,
-            { color: colors.emergency, fontFamily: Fonts.arabic.medium },
+            { color: colors.emergency, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
           ]}
         >
-          مسح
+          {t('talk.clear')}
         </Button>
 
         <Button
@@ -107,10 +109,10 @@ export default function TalkScreen() {
               backgroundColor: text.trim() ? colors.action : colors.disabled,
             },
           ]}
-          labelStyle={[styles.speakBtnText, { fontFamily: Fonts.arabic.bold }]}
+          labelStyle={[styles.speakBtnText, { fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold }]}
           buttonColor={text.trim() ? colors.action : colors.disabled}
         >
-          قُـول
+          {t('talk.say')}
         </Button>
       </View>
     </View>

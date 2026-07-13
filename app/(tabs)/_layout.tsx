@@ -1,9 +1,11 @@
 import { Tabs } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../../src/context/ThemeContext';
+import { useLanguage } from '../../src/i18n';
 
 export default function TabLayout() {
   const { colors } = useTheme();
+  const { t } = useLanguage();
 
   return (
     <Tabs
@@ -22,7 +24,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'الرئيسية',
+          title: t('tabs.home'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
@@ -31,7 +33,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="talk"
         options={{
-          title: 'اكتب لتتحدث',
+          title: t('tabs.talk'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="chatbubble-ellipses" size={size} color={color} />
           ),
@@ -40,7 +42,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="entertainment"
         options={{
-          title: 'الترفيه',
+          title: t('tabs.entertainment'),
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="play-circle-outline" size={size} color={color} />
           ),
@@ -49,7 +51,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'الإعدادات',
+          title: t('tabs.settings'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings-outline" size={size} color={color} />
           ),

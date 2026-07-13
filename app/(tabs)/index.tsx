@@ -6,6 +6,7 @@ import * as Speech from 'expo-speech';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../src/context/ThemeContext';
+import { useLanguage } from '../../src/i18n';
 import { Fonts } from '../../constants/theme';
 import { PhraseCard } from '../../src/types';
 import { DEFAULT_CARDS } from '../../src/data/defaults';
@@ -21,6 +22,7 @@ const CARD_HEIGHT = CARD_WIDTH * 1.05;
 
 export default function SmartDashboard() {
   const { colors, user, autoSpeakDelay } = useTheme();
+  const { language, t, isRTL } = useLanguage();
   const router = useRouter();
   const params = useLocalSearchParams<{ newTile?: string }>();
   const [cards, setCards] = useState<PhraseCard[]>(DEFAULT_CARDS);
@@ -64,9 +66,10 @@ export default function SmartDashboard() {
     setRefreshing(false);
   };
 
-  const onTilePress = (phrase: string) => {
+  const onTilePress = (card: PhraseCard) => {
+    const text = language === 'ar' ? card.labelAr : card.labelEn;
     setTimeout(() => {
-      Speech.speak(phrase, { language: 'ar', pitch: 1.0, rate: 0.85 });
+      Speech.speak(text, { language: language === 'ar' ? 'ar' : 'en', pitch: 1.0, rate: 0.85 });
     }, autoSpeakDelay);
   };
 
@@ -74,7 +77,7 @@ export default function SmartDashboard() {
     return (
       <TouchableRipple
         key={item.id}
-        onPress={() => onTilePress(item.labelAr)}
+        onPress={() => onTilePress(item)}
         style={styles.tileWrapper}
       >
         <Surface
@@ -86,19 +89,19 @@ export default function SmartDashboard() {
           </View>
           <Text
             style={[
-              styles.tileTextAr,
-              { color: colors.text, fontFamily: Fonts.arabic.bold },
+              styles.tileTextPrimary,
+              { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
             ]}
           >
-            {item.labelAr}
+            {language === 'ar' ? item.labelAr : item.labelEn}
           </Text>
           <Text
             style={[
-              styles.tileTextEn,
-              { color: colors.muted, fontFamily: Fonts.english.regular },
+              styles.tileTextSecondary,
+              { color: colors.muted, fontFamily: language === 'ar' ? Fonts.english.regular : Fonts.arabic.regular },
             ]}
           >
-            {item.labelEn}
+            {language === 'ar' ? item.labelEn : item.labelAr}
           </Text>
         </Surface>
       </TouchableRipple>
@@ -116,40 +119,40 @@ export default function SmartDashboard() {
             <Text
               style={[
                 styles.greetingText,
-                { color: colors.text, fontFamily: Fonts.arabic.bold },
+                { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
               ]}
             >
-              !أهلاً {user?.name || 'صديقي'}
+              {t('home.greeting')} {user?.name || t('home.greetingFallback')}
             </Text>
             <View style={styles.ribbonWrapper}>
               <QuickRibbon
-                label="ايوه"
+                label={t('home.ribbon.yes')}
                 icon="checkmark-circle"
                 bg={colors.action}
                 textColor="#FFFFFF"
-                onPress={() => Speech.speak('ايوه', { language: 'ar' })}
+                onPress={() => Speech.speak(t('home.ribbon.yes'), { language: language === 'ar' ? 'ar' : 'en' })}
               />
               <QuickRibbon
-                label="لأ"
+                label={t('home.ribbon.no')}
                 icon="close-circle"
                 bg={colors.emergency}
                 textColor="#FFFFFF"
-                onPress={() => Speech.speak('لأ', { language: 'ar' })}
+                onPress={() => Speech.speak(t('home.ribbon.no'), { language: language === 'ar' ? 'ar' : 'en' })}
               />
               <QuickRibbon
-                label="شكراً"
+                label={t('home.ribbon.thanks')}
                 bg={colors.primary}
                 textColor="#FFFFFF"
-                onPress={() => Speech.speak('شكرا', { language: 'ar' })}
+                onPress={() => Speech.speak(t('home.ribbon.thanks'), { language: language === 'ar' ? 'ar' : 'en' })}
               />
               <QuickRibbon
-                label="النجدة"
+                label={t('home.ribbon.help')}
                 icon="alert-circle"
                 bg={colors.secondary}
                 textColor={colors.text}
                 onPress={() =>
-                  Speech.speak('يا كابتن لو سمحت المساعدة', {
-                    language: 'ar',
+                  Speech.speak(t('home.ribbon.helpPhrase'), {
+                    language: language === 'ar' ? 'ar' : 'en',
                   })
                 }
               />
@@ -178,10 +181,10 @@ export default function SmartDashboard() {
               <Text
                 style={[
                   styles.addCardText,
-                  { color: colors.primary, fontFamily: Fonts.arabic.medium },
+                  { color: colors.primary, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
                 ]}
               >
-                إضافة
+                {t('home.add')}
               </Text>
             </Surface>
           </TouchableRipple>
@@ -279,8 +282,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconPlacement: { marginBottom: 10 },
-  tileTextAr: { fontSize: 20, textAlign: 'center' },
-  tileTextEn: { fontSize: 14, textAlign: 'center', marginTop: 4 },
+  tileTextPrimary: { fontSize: 20, textAlign: 'center' },
+  tileTextSecondary: { fontSize: 14, textAlign: 'center', marginTop: 4 },
   addCard: {
     borderWidth: 2,
     borderStyle: 'dashed',

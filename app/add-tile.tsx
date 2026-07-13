@@ -3,11 +3,13 @@ import { ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Chip, Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../src/context/ThemeContext';
+import { useLanguage } from '../src/i18n';
 import { Fonts, ICON_PRESETS, COLOR_PRESETS, TILE_PRESETS } from '../constants/theme';
 import { renderIcon } from '../src/utils/icons';
 
 export default function AddTileScreen() {
   const { colors } = useTheme();
+  const { language, t } = useLanguage();
   const router = useRouter();
   const [labelAr, setLabelAr] = useState('');
   const [labelEn, setLabelEn] = useState('');
@@ -47,10 +49,10 @@ export default function AddTileScreen() {
       <Text
         style={[
           styles.sectionTitle,
-          { color: colors.text, fontFamily: Fonts.arabic.bold },
+          { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
         ]}
       >
-        إضافة سريعة
+        {t('addTile.quickAdd')}
       </Text>
       <View style={styles.quickAddGrid}>
         {TILE_PRESETS.map((preset, i) => (
@@ -60,10 +62,10 @@ export default function AddTileScreen() {
             style={[styles.quickAddChip, { backgroundColor: preset.color }]}
             textStyle={[
               styles.quickAddText,
-              { color: colors.text, fontFamily: Fonts.arabic.medium },
+              { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
             ]}
           >
-            {preset.labelAr}
+            {language === 'ar' ? preset.labelAr : preset.labelEn}
           </Chip>
         ))}
       </View>
@@ -73,18 +75,18 @@ export default function AddTileScreen() {
       <Text
         style={[
           styles.sectionTitle,
-          { color: colors.text, fontFamily: Fonts.arabic.bold },
+          { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
         ]}
       >
-        إنشاء كرت مخصص
+        {t('addTile.createCustom')}
       </Text>
 
       <TextInput
         mode="outlined"
-        label="النص بالعربي"
+        label={t('addTile.arabicText')}
         value={labelAr}
         onChangeText={setLabelAr}
-        placeholder="مثال: عايز مية"
+        placeholder={t('addTile.arabicPlaceholder')}
         style={styles.input}
         outlineColor={colors.border}
         activeOutlineColor={colors.primary}
@@ -96,10 +98,10 @@ export default function AddTileScreen() {
 
       <TextInput
         mode="outlined"
-        label="النص بالإنجليزي"
+        label={t('addTile.englishText')}
         value={labelEn}
         onChangeText={setLabelEn}
-        placeholder="e.g. I want water"
+        placeholder={t('addTile.englishPlaceholder')}
         style={styles.input}
         outlineColor={colors.border}
         activeOutlineColor={colors.primary}
@@ -112,10 +114,10 @@ export default function AddTileScreen() {
       <Text
         style={[
           styles.label,
-          { color: colors.muted, fontFamily: Fonts.arabic.medium },
+          { color: colors.muted, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
         ]}
       >
-        أيقونة
+        {t('addTile.icon')}
       </Text>
       <View style={styles.iconGrid}>
         {ICON_PRESETS.map((icon, i) => {
@@ -147,10 +149,10 @@ export default function AddTileScreen() {
       <Text
         style={[
           styles.label,
-          { color: colors.muted, fontFamily: Fonts.arabic.medium },
+          { color: colors.muted, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
         ]}
       >
-        لون
+        {t('addTile.color')}
       </Text>
       <View style={styles.colorGrid}>
         {COLOR_PRESETS.map((color, i) => (
@@ -174,11 +176,11 @@ export default function AddTileScreen() {
         mode="contained"
         onPress={handleAdd}
         style={styles.addButton}
-        labelStyle={[styles.addButtonText, { fontFamily: Fonts.arabic.bold }]}
+        labelStyle={[styles.addButtonText, { fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold }]}
         buttonColor={colors.action}
         icon="plus-circle"
       >
-        إضافة
+        {t('addTile.add')}
       </Button>
     </ScrollView>
   );

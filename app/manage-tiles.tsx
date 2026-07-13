@@ -9,6 +9,7 @@ import {
 import { Surface, Text, IconButton, Avatar, Divider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../src/context/ThemeContext';
+import { useLanguage } from '../src/i18n';
 import { Fonts } from '../constants/theme';
 import { PhraseCard } from '../src/types';
 import { DEFAULT_CARDS } from '../src/data/defaults';
@@ -16,6 +17,7 @@ import { renderIcon } from '../src/utils/icons';
 
 export default function ManageTilesScreen() {
   const { colors } = useTheme();
+  const { language, t } = useLanguage();
   const [cards, setCards] = useState<PhraseCard[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -41,14 +43,14 @@ export default function ManageTilesScreen() {
   const deleteCard = (id: string) => {
     const card = cards.find((c) => c.id === id);
     if (card?.isDefault) {
-      Alert.alert('تنبيه', 'لا يمكن حذف الكروت الأساسية');
+      Alert.alert(t('manageTiles.deleteWarning'), t('manageTiles.cannotDelete'));
       return;
     }
 
-    Alert.alert('حذف', `حذف "${card?.labelAr}"؟`, [
-      { text: 'إلغاء', style: 'cancel' },
+    Alert.alert(t('manageTiles.deleteTitle'), `${t('manageTiles.deleteMessage')} "${language === 'ar' ? card?.labelAr : card?.labelEn}"?`, [
+      { text: t('manageTiles.deleteCancel'), style: 'cancel' },
       {
-        text: 'حذف',
+        text: t('manageTiles.deleteConfirm'),
         style: 'destructive',
         onPress: async () => {
           const next = cards.filter((c) => c.id !== id);
@@ -76,18 +78,18 @@ export default function ManageTilesScreen() {
             <Text
               style={[
                 styles.labelAr,
-                { color: colors.text, fontFamily: Fonts.arabic.bold },
+                { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
               ]}
             >
-              {item.labelAr}
+              {language === 'ar' ? item.labelAr : item.labelEn}
             </Text>
             <Text
               style={[
                 styles.labelEn,
-                { color: colors.muted, fontFamily: Fonts.english.regular },
+                { color: colors.muted, fontFamily: language === 'ar' ? Fonts.english.regular : Fonts.arabic.regular },
               ]}
             >
-              {item.labelEn}
+              {language === 'ar' ? item.labelEn : item.labelAr}
             </Text>
           </View>
         </View>
@@ -116,10 +118,10 @@ export default function ManageTilesScreen() {
           <Text
             style={[
               styles.header,
-              { color: colors.muted, fontFamily: Fonts.arabic.medium },
+              { color: colors.muted, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
             ]}
           >
-            الكروت الأساسية محمية ولا يمكن حذفها
+            {t('manageTiles.protected')}
           </Text>
         }
         ItemSeparatorComponent={() => <Divider />}

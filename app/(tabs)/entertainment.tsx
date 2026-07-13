@@ -20,6 +20,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../src/context/ThemeContext';
+import { useLanguage } from '../../src/i18n';
 import { Fonts } from '../../constants/theme';
 import { FeedItem } from '../../src/types';
 import { TRIVIA_QUESTIONS } from '../../src/data/defaults';
@@ -34,6 +35,7 @@ function getFeedTitle(url: string): string {
 
 export default function EntertainmentHub() {
   const { colors } = useTheme();
+  const { language, t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'news' | 'trivia'>('news');
   const [feeds, setFeeds] = useState<FeedItem[]>([]);
   const [loadingFeeds, setLoadingFeeds] = useState(false);
@@ -110,11 +112,12 @@ export default function EntertainmentHub() {
     const q = TRIVIA_QUESTIONS[currentTrivia];
     if (index === q.correctIndex) {
       setScore((s) => s + 1);
-      Speech.speak('أحسنت! إجابة صحيحة', { language: 'ar' });
+      Speech.speak(t('entertainment.correctAnswer'), { language: language === 'ar' ? 'ar' : 'en' });
     } else {
+      const correctOption = language === 'ar' ? q.options[q.correctIndex] : q.optionsEn[q.correctIndex];
       Speech.speak(
-        `الإجابة الصحيحة هي: ${q.options[q.correctIndex]}`,
-        { language: 'ar' },
+        `${t('entertainment.correctAnswerIs')} ${correctOption}`,
+        { language: language === 'ar' ? 'ar' : 'en' },
       );
     }
   };
@@ -135,6 +138,8 @@ export default function EntertainmentHub() {
   };
 
   const trivia = TRIVIA_QUESTIONS[currentTrivia];
+  const questionText = language === 'ar' ? trivia.questionAr : trivia.questionEn;
+  const optionsText = language === 'ar' ? trivia.options : trivia.optionsEn;
 
   return (
     <ScrollView
@@ -154,7 +159,7 @@ export default function EntertainmentHub() {
         buttons={[
           {
             value: 'news',
-            label: 'الأخبار',
+            label: t('entertainment.news'),
             icon: () => (
               <Ionicons
                 name="newspaper"
@@ -165,7 +170,7 @@ export default function EntertainmentHub() {
           },
           {
             value: 'trivia',
-            label: 'الألعاب الذهنية',
+            label: t('entertainment.trivia'),
             icon: () => (
               <MaterialCommunityIcons
                 name="brain"
@@ -184,17 +189,23 @@ export default function EntertainmentHub() {
           loadingFeeds={loadingFeeds}
           feeds={feeds}
           colors={colors}
+          language={language}
+          t={t}
           onRefreshFeeds={() => fetchFeeds()}
         />
       ) : (
         <TriviaTab
-          trivia={trivia}
+          questionText={questionText}
+          optionsText={optionsText}
           triviaIndex={currentTrivia}
           triviaTotal={TRIVIA_QUESTIONS.length}
           score={score}
           selectedAnswer={selectedAnswer}
           showResult={showResult}
+          correctIndex={trivia.correctIndex}
           colors={colors}
+          language={language}
+          t={t}
           onAnswer={handleTriviaAnswer}
           onNext={nextTrivia}
           onReset={resetTrivia}
@@ -209,12 +220,16 @@ function NewsTab({
   loadingFeeds,
   feeds,
   colors,
+  language,
+  t,
   onRefreshFeeds,
 }: {
   rssUrls: string[];
   loadingFeeds: boolean;
   feeds: FeedItem[];
   colors: any;
+  language: string;
+  t: (key: string) => string;
   onRefreshFeeds: () => void;
 }) {
   return (
@@ -223,10 +238,10 @@ function NewsTab({
         <Text
           style={[
             styles.sectionTitle,
-            { color: colors.text, fontFamily: Fonts.arabic.bold },
+            { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
           ]}
         >
-          آخر الأخبار 📰
+          {t('entertainment.latestNews')} 📰
         </Text>
         <IconButton
           icon="refresh"
@@ -242,18 +257,18 @@ function NewsTab({
           <Text
             style={[
               styles.emptyText,
-              { color: colors.muted, fontFamily: Fonts.arabic.medium },
+              { color: colors.muted, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
             ]}
           >
-            لا توجد مصادر أخبار
+            {t('entertainment.noSources')}
           </Text>
           <Text
             style={[
               styles.emptySub,
-              { color: colors.disabled, fontFamily: Fonts.arabic.regular },
+              { color: colors.disabled, fontFamily: language === 'ar' ? Fonts.arabic.regular : Fonts.english.regular },
             ]}
           >
-            أضف RSS feeds من الإعدادات
+            {t('entertainment.addSourcesHint')}
           </Text>
         </Surface>
       ) : loadingFeeds ? (
@@ -283,7 +298,7 @@ function NewsTab({
               <Text
                 style={[
                   styles.newsTitle,
-                  { color: colors.text, fontFamily: Fonts.arabic.bold },
+                  { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
                 ]}
                 numberOfLines={2}
               >
@@ -293,7 +308,7 @@ function NewsTab({
                 <Text
                   style={[
                     styles.newsDesc,
-                    { color: colors.muted, fontFamily: Fonts.arabic.regular },
+                    { color: colors.muted, fontFamily: language === 'ar' ? Fonts.arabic.regular : Fonts.english.regular },
                   ]}
                   numberOfLines={3}
                 >
@@ -304,7 +319,7 @@ function NewsTab({
                 mode="text"
                 onPress={() =>
                   Speech.speak(`${item.title}. ${item.description}`, {
-                    language: 'ar',
+                    language: language === 'ar' ? 'ar' : 'en',
                     rate: 0.85,
                   })
                 }
@@ -312,7 +327,7 @@ function NewsTab({
                 labelStyle={{ color: colors.primary }}
                 icon="volume-high"
               >
-                اسمع
+                {t('entertainment.listen')}
               </Button>
             </Card.Content>
           </Card>
@@ -323,24 +338,32 @@ function NewsTab({
 }
 
 function TriviaTab({
-  trivia,
+  questionText,
+  optionsText,
   triviaIndex,
   triviaTotal,
   score,
   selectedAnswer,
   showResult,
+  correctIndex,
   colors,
+  language,
+  t,
   onAnswer,
   onNext,
   onReset,
 }: {
-  trivia: { questionAr: string; options: string[]; correctIndex: number };
+  questionText: string;
+  optionsText: string[];
   triviaIndex: number;
   triviaTotal: number;
   score: number;
   selectedAnswer: number | null;
   showResult: boolean;
+  correctIndex: number;
   colors: any;
+  language: string;
+  t: (key: string) => string;
   onAnswer: (index: number) => void;
   onNext: () => void;
   onReset: () => void;
@@ -350,28 +373,28 @@ function TriviaTab({
       <Text
         style={[
           styles.sectionTitle,
-          { color: colors.text, fontFamily: Fonts.arabic.bold },
+          { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
         ]}
       >
-        الألعاب الذهنية 🧠
+        {t('entertainment.trivia')} 🧠
       </Text>
       <Text
         style={[
           styles.sectionSub,
-          { color: colors.muted, fontFamily: Fonts.arabic.medium },
+          { color: colors.muted, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
         ]}
       >
-        اختبر ذكاءك وتمرن على التفكير
+        {t('entertainment.triviaSubtitle')}
       </Text>
 
       <Surface style={styles.scoreBar} elevation={1}>
         <Text
           style={[
             styles.scoreText,
-            { color: colors.text, fontFamily: Fonts.arabic.medium },
+            { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
           ]}
         >
-          السؤال {triviaIndex + 1} / {triviaTotal}
+          {t('entertainment.question')} {triviaIndex + 1} / {triviaTotal}
         </Text>
         <Text
           style={[
@@ -379,7 +402,7 @@ function TriviaTab({
             { color: colors.primary, fontFamily: Fonts.english.bold },
           ]}
         >
-          النتيجة: {score}
+          {t('entertainment.score')} {score}
         </Text>
       </Surface>
 
@@ -389,27 +412,27 @@ function TriviaTab({
             icon="volume-high"
             size={22}
             iconColor={colors.primary}
-            onPress={() => Speech.speak(trivia.questionAr, { language: 'ar' })}
+            onPress={() => Speech.speak(questionText, { language: language === 'ar' ? 'ar' : 'en' })}
             style={styles.speakerBtn}
           />
           <Text
             style={[
               styles.questionText,
-              { color: colors.text, fontFamily: Fonts.arabic.bold },
+              { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
             ]}
           >
-            {trivia.questionAr}
+            {questionText}
           </Text>
         </Card.Content>
       </Card>
 
-      {trivia.options.map((opt, i) => {
+      {optionsText.map((opt, i) => {
         let bgColor = colors.inputBg;
         let borderColor = colors.border;
         let textColor = colors.text;
 
         if (showResult) {
-          if (i === trivia.correctIndex) {
+          if (i === correctIndex) {
             bgColor = '#D1FAE5';
             borderColor = colors.action;
             textColor = '#065F46';
@@ -432,7 +455,7 @@ function TriviaTab({
             ]}
             labelStyle={[
               styles.optionText,
-              { color: textColor, fontFamily: Fonts.arabic.medium },
+              { color: textColor, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
             ]}
           >
             {opt}
@@ -449,21 +472,21 @@ function TriviaTab({
               style={styles.nextBtn}
               labelStyle={[
                 styles.nextBtnText,
-                { fontFamily: Fonts.arabic.bold },
+                { fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
               ]}
               buttonColor={colors.primary}
             >
-              السؤال التالي
+              {t('entertainment.nextQuestion')}
             </Button>
           ) : (
             <View style={styles.triviaActions}>
               <Text
                 style={[
                   styles.finalScore,
-                  { color: colors.text, fontFamily: Fonts.arabic.bold },
+                  { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
                 ]}
               >
-                النتيجة النهائية: {score} / {triviaTotal}
+                {t('entertainment.finalScore')} {score} / {triviaTotal}
               </Text>
               <Button
                 mode="contained"
@@ -471,11 +494,11 @@ function TriviaTab({
                 style={styles.nextBtn}
                 labelStyle={[
                   styles.nextBtnText,
-                  { fontFamily: Fonts.arabic.bold },
+                  { fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
                 ]}
                 buttonColor={colors.secondary}
               >
-                العب مرة تانية
+                {t('entertainment.playAgain')}
               </Button>
             </View>
           )}
