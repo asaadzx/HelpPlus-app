@@ -4,6 +4,7 @@ import {
   StyleSheet,
   View,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import {
   TextInput,
@@ -15,12 +16,16 @@ import {
   Chip,
   IconButton,
   Surface,
+  Menu,
 } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as Updates from 'expo-updates';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../src/context/ThemeContext';
+import { useLanguage } from '../../src/i18n';
+import { Language } from '../../src/types';
 import { Fonts } from '../../constants/theme';
 import { PRESET_FEEDS } from '../../src/data/defaults';
 
@@ -36,6 +41,7 @@ export default function SettingsScreen() {
     autoSpeakDelay,
     setAutoSpeakDelay,
   } = useTheme();
+  const { language, setLanguage, t, isRTL } = useLanguage();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -113,6 +119,7 @@ export default function SettingsScreen() {
         style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={styles.centerContent}
       >
+        <LanguageSelector language={language} setLanguage={setLanguage} t={t} colors={colors} />
         <Card style={styles.loginCard}>
           <Card.Content style={styles.loginCardContent}>
             <Avatar.Icon
@@ -124,15 +131,15 @@ export default function SettingsScreen() {
             <Text
               style={[
                 styles.loginTitle,
-                { color: colors.text, fontFamily: Fonts.arabic.bold },
+                { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
               ]}
             >
-              تسجيل الدخول
+              {t('settings.login')}
             </Text>
 
             <TextInput
               mode="outlined"
-              label="البريد الإلكتروني"
+              label={t('settings.email')}
               value={email}
               onChangeText={setEmail}
               placeholder="example@email.com"
@@ -154,7 +161,7 @@ export default function SettingsScreen() {
 
             <TextInput
               mode="outlined"
-              label="كلمة المرور"
+              label={t('settings.password')}
               value={password}
               onChangeText={setPassword}
               placeholder="••••••••"
@@ -179,11 +186,11 @@ export default function SettingsScreen() {
               style={styles.loginButton}
               labelStyle={[
                 styles.loginButtonText,
-                { fontFamily: Fonts.arabic.bold },
+                { fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
               ]}
               buttonColor={colors.primary}
             >
-              دخول
+              {t('settings.loginButton')}
             </Button>
           </Card.Content>
         </Card>
@@ -228,7 +235,7 @@ export default function SettingsScreen() {
               { color: colors.text, fontFamily: Fonts.arabic.bold },
             ]}
           >
-            {user?.name || 'مستخدم'}
+            {user?.name || t('settings.userFallback')}
           </Text>
           <Text
             style={[
@@ -254,7 +261,7 @@ export default function SettingsScreen() {
               { color: colors.text, fontFamily: Fonts.arabic.medium },
             ]}
           >
-            الوضع {isDark ? 'الليلي' : 'النهاري'}
+            {isDark ? t('settings.themeNight') : t('settings.themeDay')}
           </Text>
         </View>
         <Switch value={isDark} onValueChange={toggleTheme} color={colors.primary} />
@@ -267,10 +274,10 @@ export default function SettingsScreen() {
             <Text
               style={[
                 styles.settingLabel,
-                { color: colors.text, fontFamily: Fonts.arabic.medium },
+                { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
               ]}
             >
-              تأخير النطق التلقائي
+              {t('settings.autoSpeakDelay')}
             </Text>
             <Text
               style={[
@@ -314,7 +321,7 @@ export default function SettingsScreen() {
               if (!isNaN(n)) setAutoSpeakDelay(n);
             }}
             keyboardType="number-pad"
-            placeholder="أي رقم (الحد الأدنى 10)"
+            placeholder={t('settings.delayPlaceholder')}
             style={styles.delayInput}
             outlineColor={colors.border}
             activeOutlineColor={colors.primary}
@@ -334,10 +341,10 @@ export default function SettingsScreen() {
           <Text
             style={[
               styles.settingLabel,
-              { color: colors.text, fontFamily: Fonts.arabic.medium },
+              { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
             ]}
           >
-            إدارة الكروت
+            {t('settings.manageCards')}
           </Text>
         </View>
         <IconButton
@@ -355,10 +362,10 @@ export default function SettingsScreen() {
             <Text
               style={[
                 styles.settingLabel,
-                { color: colors.text, fontFamily: Fonts.arabic.bold },
-              ]}
-            >
-              مصادر الأخبار (RSS)
+              { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
+            ]}
+          >
+            {t('settings.newsSources')}
             </Text>
           </View>
 
@@ -388,10 +395,10 @@ export default function SettingsScreen() {
           <Text
             style={[
               styles.presetLabel,
-              { color: colors.muted, fontFamily: Fonts.arabic.medium },
+              { color: colors.muted, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
             ]}
           >
-            أضف من القائمة:
+            {t('settings.addFromList')}
           </Text>
           <View style={styles.presetGrid}>
             {PRESET_FEEDS.map((preset) => {
@@ -426,10 +433,10 @@ export default function SettingsScreen() {
           <Text
             style={[
               styles.presetLabel,
-              { color: colors.muted, fontFamily: Fonts.arabic.medium },
+              { color: colors.muted, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
             ]}
           >
-            أضف رابط مخصص:
+            {t('settings.addCustomLink')}
           </Text>
           <View style={styles.customFeedRow}>
             <TextInput
@@ -467,10 +474,10 @@ export default function SettingsScreen() {
           <Text
             style={[
               styles.settingLabel,
-              { color: colors.emergency, fontFamily: Fonts.arabic.medium },
+              { color: colors.emergency, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
             ]}
           >
-            تسجيل الخروج
+            {t('settings.logout')}
           </Text>
         </View>
         <IconButton
@@ -481,6 +488,68 @@ export default function SettingsScreen() {
         />
       </Surface>
     </ScrollView>
+  );
+}
+
+function LanguageSelector({
+  language,
+  setLanguage,
+  t,
+  colors,
+}: {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+  colors: any;
+}) {
+  const [visible, setVisible] = useState(false);
+
+  const languages: { code: Language; label: string; nativeName: string }[] = [
+    { code: 'ar', label: 'Arabic', nativeName: 'العربية' },
+    { code: 'en', label: 'English', nativeName: 'English' },
+  ];
+
+  const handleLanguageChange = (lang: Language) => {
+    setVisible(false);
+    if (lang === language) return;
+    setLanguage(lang);
+    Alert.alert(
+      t('dialog.restartTitle'),
+      t('dialog.restartMessage'),
+      [
+        { text: t('dialog.cancel'), style: 'cancel' },
+        { text: t('dialog.restart'), onPress: () => Updates.reloadAsync() },
+      ],
+    );
+  };
+
+  return (
+    <Surface style={styles.languageRow} elevation={1}>
+      <View style={styles.settingLeft}>
+        <Ionicons name="language" size={22} color={colors.primary} />
+        <Text style={[styles.settingLabel, { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium }]}>
+          {t('settings.language')}
+        </Text>
+      </View>
+      <Menu
+        visible={visible}
+        onDismiss={() => setVisible(false)}
+        anchor={
+          <Button mode="outlined" onPress={() => setVisible(true)} style={styles.languageBtn}>
+            {languages.find((l) => l.code === language)?.nativeName}
+          </Button>
+        }
+      >
+        {languages.map((lang) => (
+          <Menu.Item
+            key={lang.code}
+            onPress={() => handleLanguageChange(lang.code)}
+            title={lang.nativeName}
+            leadingIcon={lang.code === language ? 'check' : undefined}
+          />
+        ))}
+      </Menu>
+    </Surface>
   );
 }
 
@@ -568,5 +637,16 @@ const styles = StyleSheet.create({
   delayChipText: { fontSize: 13 },
   delayInput: {
     marginTop: 8,
+  },
+  languageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  languageBtn: {
+    minWidth: 100,
   },
 });
