@@ -71,7 +71,7 @@ export default function ManageTilesScreen() {
         <View style={styles.rowLeft}>
           <Avatar.Icon
             size={44}
-            icon={() => renderIcon(item.iconProvider, item.icon, 24, colors.text)}
+            icon={() => renderIcon(item.iconProvider, item.icon, 24, colors.cardIcon)}
             style={[styles.iconCircle, { backgroundColor: item.color }]}
           />
           <View>

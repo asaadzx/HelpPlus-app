@@ -85,7 +85,7 @@ export default function SmartDashboard() {
           elevation={2}
         >
           <View style={styles.iconPlacement}>
-            {renderIcon(item.iconProvider, item.icon, 48, colors.text)}
+            {renderIcon(item.iconProvider, item.icon, 48, colors.cardIcon)}
           </View>
           <Text
             style={[
@@ -119,7 +119,7 @@ export default function SmartDashboard() {
             <Text
               style={[
                 styles.greetingText,
-                { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
+              { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
               ]}
             >
               {t('home.greeting')} {user?.name || t('home.greetingFallback')}

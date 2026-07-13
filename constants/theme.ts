@@ -10,6 +10,7 @@ export const LightColors = {
   cardDefault: '#E0F2FE',
   cardMedicine: '#FEF3C7',
   cardTired: '#FEE2E2',
+  cardIcon: '#1A3038',
   muted: '#64748B',
   border: '#E2E8F0',
   inputBg: '#F8FAFC',
@@ -58,6 +59,7 @@ export const DarkColors = {
   cardDefault: '#0f1a1a',
   cardMedicine: '#1a1a0a',
   cardTired: '#1a0a0a',
+  cardIcon: '#1A3038',
   muted: '#7a9aaa',
   border: '#1a2a2a',
   inputBg: '#0a1515',
@@ -106,6 +108,7 @@ export type ThemeColors = {
   cardDefault: string;
   cardMedicine: string;
   cardTired: string;
+  cardIcon: string;
   muted: string;
   border: string;
   inputBg: string;
