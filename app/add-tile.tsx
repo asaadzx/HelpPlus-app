@@ -1,15 +1,10 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Chip, Text } from 'react-native-paper';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../src/context/ThemeContext';
 import { Fonts, ICON_PRESETS, COLOR_PRESETS, TILE_PRESETS } from '../constants/theme';
-
-const iconMap: Record<string, any> = {
-  Ionicons,
-  MaterialCommunityIcons,
-};
+import { renderIcon } from '../src/utils/icons';
 
 export default function AddTileScreen() {
   const { colors } = useTheme();
@@ -20,21 +15,41 @@ export default function AddTileScreen() {
   const [selectedColor, setSelectedColor] = useState(COLOR_PRESETS[0]);
 
   const handleAdd = () => {
-    if (!labelAr.trim()) {
-      return;
-    }
+    if (!labelAr.trim()) return;
     router.dismiss();
-    router.push({ pathname: '/', params: { newTile: JSON.stringify({ labelAr, labelEn, icon: selectedIcon.name, iconProvider: selectedIcon.provider, color: selectedColor }) } });
+    router.push({
+      pathname: '/',
+      params: {
+        newTile: JSON.stringify({
+          labelAr,
+          labelEn,
+          icon: selectedIcon.name,
+          iconProvider: selectedIcon.provider,
+          color: selectedColor,
+        }),
+      },
+    });
   };
 
-  const handleQuickAdd = (preset: typeof TILE_PRESETS[0]) => {
+  const handleQuickAdd = (preset: (typeof TILE_PRESETS)[0]) => {
     router.dismiss();
-    router.push({ pathname: '/', params: { newTile: JSON.stringify(preset) } });
+    router.push({
+      pathname: '/',
+      params: { newTile: JSON.stringify(preset) },
+    });
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
-      <Text style={[styles.sectionTitle, { color: colors.text, fontFamily: Fonts.arabic.bold }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.content}
+    >
+      <Text
+        style={[
+          styles.sectionTitle,
+          { color: colors.text, fontFamily: Fonts.arabic.bold },
+        ]}
+      >
         إضافة سريعة
       </Text>
       <View style={styles.quickAddGrid}>
@@ -43,7 +58,10 @@ export default function AddTileScreen() {
             key={i}
             onPress={() => handleQuickAdd(preset)}
             style={[styles.quickAddChip, { backgroundColor: preset.color }]}
-            textStyle={[styles.quickAddText, { color: colors.text, fontFamily: Fonts.arabic.medium }]}
+            textStyle={[
+              styles.quickAddText,
+              { color: colors.text, fontFamily: Fonts.arabic.medium },
+            ]}
           >
             {preset.labelAr}
           </Chip>
@@ -52,7 +70,12 @@ export default function AddTileScreen() {
 
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-      <Text style={[styles.sectionTitle, { color: colors.text, fontFamily: Fonts.arabic.bold }]}>
+      <Text
+        style={[
+          styles.sectionTitle,
+          { color: colors.text, fontFamily: Fonts.arabic.bold },
+        ]}
+      >
         إنشاء كرت مخصص
       </Text>
 
@@ -65,7 +88,9 @@ export default function AddTileScreen() {
         style={styles.input}
         outlineColor={colors.border}
         activeOutlineColor={colors.primary}
-        theme={{ colors: { background: colors.white, onSurfaceVariant: colors.disabled } }}
+        theme={{
+          colors: { background: colors.white, onSurfaceVariant: colors.disabled },
+        }}
         left={<TextInput.Icon icon="translate" color={colors.primary} />}
       />
 
@@ -78,37 +103,68 @@ export default function AddTileScreen() {
         style={styles.input}
         outlineColor={colors.border}
         activeOutlineColor={colors.primary}
-        theme={{ colors: { background: colors.white, onSurfaceVariant: colors.disabled } }}
+        theme={{
+          colors: { background: colors.white, onSurfaceVariant: colors.disabled },
+        }}
         left={<TextInput.Icon icon="translate" color={colors.secondary} />}
       />
 
-      <Text style={[styles.label, { color: colors.muted, fontFamily: Fonts.arabic.medium }]}>
+      <Text
+        style={[
+          styles.label,
+          { color: colors.muted, fontFamily: Fonts.arabic.medium },
+        ]}
+      >
         أيقونة
       </Text>
       <View style={styles.iconGrid}>
         {ICON_PRESETS.map((icon, i) => {
-          const IconComp = iconMap[icon.provider];
           const isSelected = selectedIcon.name === icon.name;
           return (
             <TouchableOpacity
               key={i}
-              style={[styles.iconOption, { backgroundColor: isSelected ? colors.primary : colors.inputBg }]}
+              style={[
+                styles.iconOption,
+                {
+                  backgroundColor: isSelected
+                    ? colors.primary
+                    : colors.inputBg,
+                },
+              ]}
               onPress={() => setSelectedIcon(icon)}
             >
-              <IconComp name={icon.name} size={24} color={isSelected ? colors.white : colors.text} />
+              {renderIcon(
+                icon.provider,
+                icon.name,
+                24,
+                isSelected ? colors.white : colors.text,
+              )}
             </TouchableOpacity>
           );
         })}
       </View>
 
-      <Text style={[styles.label, { color: colors.muted, fontFamily: Fonts.arabic.medium }]}>
+      <Text
+        style={[
+          styles.label,
+          { color: colors.muted, fontFamily: Fonts.arabic.medium },
+        ]}
+      >
         لون
       </Text>
       <View style={styles.colorGrid}>
         {COLOR_PRESETS.map((color, i) => (
           <TouchableOpacity
             key={i}
-            style={[styles.colorOption, { backgroundColor: color, borderColor: selectedColor === color ? colors.text : colors.border, borderWidth: selectedColor === color ? 3 : 1 }]}
+            style={[
+              styles.colorOption,
+              {
+                backgroundColor: color,
+                borderColor:
+                  selectedColor === color ? colors.text : colors.border,
+                borderWidth: selectedColor === color ? 3 : 1,
+              },
+            ]}
             onPress={() => setSelectedColor(color)}
           />
         ))}
@@ -117,7 +173,7 @@ export default function AddTileScreen() {
       <Button
         mode="contained"
         onPress={handleAdd}
-        style={[styles.addButton]}
+        style={styles.addButton}
         labelStyle={[styles.addButtonText, { fontFamily: Fonts.arabic.bold }]}
         buttonColor={colors.action}
         icon="plus-circle"

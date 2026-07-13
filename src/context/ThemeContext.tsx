@@ -1,13 +1,14 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MD3LightTheme } from 'react-native-paper';
-import { LightColors, DarkColors, ThemeColors, getPaperLightTheme, getPaperDarkTheme } from '../../constants/theme';
-
-interface User {
-  name: string;
-  email: string;
-  imageUri?: string;
-}
+import {
+  LightColors,
+  DarkColors,
+  ThemeColors,
+  getPaperLightTheme,
+  getPaperDarkTheme,
+} from '../../constants/theme';
+import { User } from '../types';
 
 interface ThemeContextType {
   isDark: boolean;
@@ -43,7 +44,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      const vals = await AsyncStorage.multiGet(['theme', 'user', 'autoSpeakDelay']);
+      const vals = await AsyncStorage.multiGet([
+        'theme',
+        'user',
+        'autoSpeakDelay',
+      ]);
       if (vals[0][1]) setIsDark(vals[0][1] === 'dark');
       if (vals[1][1]) setUser(JSON.parse(vals[1][1]));
       if (vals[2][1]) setAutoSpeakDelayState(Number(vals[2][1]));
@@ -86,7 +91,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   if (!loaded) return null;
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme, colors: isDark ? DarkColors : LightColors, paperTheme, user, login, logout, updateUser, autoSpeakDelay, setAutoSpeakDelay }}>
+    <ThemeContext.Provider
+      value={{
+        isDark,
+        toggleTheme,
+        colors: isDark ? DarkColors : LightColors,
+        paperTheme,
+        user,
+        login,
+        logout,
+        updateUser,
+        autoSpeakDelay,
+        setAutoSpeakDelay,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

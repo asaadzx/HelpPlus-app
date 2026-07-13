@@ -6,23 +6,28 @@ import * as Speech from 'expo-speech';
 import { useTheme } from '../../src/context/ThemeContext';
 import { Fonts } from '../../constants/theme';
 
+const QUICK_PHRASES = [
+  { ar: 'ايوه', en: 'Yes' },
+  { ar: 'لأ', en: 'No' },
+  { ar: 'شكراً', en: 'Thanks' },
+  { ar: 'النجدة', en: 'Help' },
+  { ar: 'عايز مية', en: 'Water' },
+  { ar: 'تعبان', en: 'Tired' },
+];
+
 export default function TalkScreen() {
   const { colors, autoSpeakDelay } = useTheme();
   const [text, setText] = useState('');
 
   const speak = () => {
     if (!text.trim()) return;
-    Speech.speak(text, {
-      language: 'ar',
-      pitch: 1.0,
-      rate: 0.85,
-    });
+    Speech.speak(text, { language: 'ar', pitch: 1.0, rate: 0.85 });
   };
 
-  const handleTextChange = (t: string) => {
-    setText(t);
-    if (t.trim().length > 0 && t.endsWith(' ')) {
-      const words = t.trim().split(' ');
+  const handleTextChange = (value: string) => {
+    setText(value);
+    if (value.trim().length > 0 && value.endsWith(' ')) {
+      const words = value.trim().split(' ');
       const lastWord = words[words.length - 1];
       setTimeout(() => {
         Speech.speak(lastWord, { language: 'ar', pitch: 1.0, rate: 0.85 });
@@ -30,25 +35,25 @@ export default function TalkScreen() {
     }
   };
 
-  const quickPhrases = [
-    { ar: 'ايوه', en: 'Yes' },
-    { ar: 'لأ', en: 'No' },
-    { ar: 'شكراً', en: 'Thanks' },
-    { ar: 'النجدة', en: 'Help' },
-    { ar: 'عايز مية', en: 'Water' },
-    { ar: 'تعبان', en: 'Tired' },
-  ];
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Surface style={styles.quickSection} elevation={0}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickScroll}>
-          {quickPhrases.map((p, i) => (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.quickScroll}
+        >
+          {QUICK_PHRASES.map((p, i) => (
             <Chip
               key={i}
-              onPress={() => setText((prev) => prev ? `${prev} ${p.ar}` : p.ar)}
+              onPress={() =>
+                setText((prev) => (prev ? `${prev} ${p.ar}` : p.ar))
+              }
               style={styles.quickPill}
-              textStyle={[styles.quickPillText, { color: colors.text, fontFamily: Fonts.arabic.medium }]}
+              textStyle={[
+                styles.quickPillText,
+                { color: colors.text, fontFamily: Fonts.arabic.medium },
+              ]}
             >
               {p.ar}
             </Chip>
@@ -67,7 +72,9 @@ export default function TalkScreen() {
           style={[styles.textInput, { fontFamily: Fonts.arabic.medium }]}
           outlineColor={colors.border}
           activeOutlineColor={colors.primary}
-          theme={{ colors: { background: colors.white, onSurfaceVariant: colors.disabled } }}
+          theme={{
+            colors: { background: colors.white, onSurfaceVariant: colors.disabled },
+          }}
         />
       </View>
 
@@ -75,9 +82,14 @@ export default function TalkScreen() {
         <Button
           mode="outlined"
           onPress={() => setText('')}
-          icon={() => <Ionicons name="trash-outline" size={20} color={colors.emergency} />}
+          icon={() => (
+            <Ionicons name="trash-outline" size={20} color={colors.emergency} />
+          )}
           style={[styles.clearBtn, { borderColor: colors.border }]}
-          labelStyle={[styles.clearBtnText, { color: colors.emergency, fontFamily: Fonts.arabic.medium }]}
+          labelStyle={[
+            styles.clearBtnText,
+            { color: colors.emergency, fontFamily: Fonts.arabic.medium },
+          ]}
         >
           مسح
         </Button>
@@ -86,8 +98,15 @@ export default function TalkScreen() {
           mode="contained"
           onPress={speak}
           disabled={!text.trim()}
-          icon={() => <Ionicons name="volume-medium" size={24} color={colors.white} />}
-          style={[styles.speakBtn, { backgroundColor: text.trim() ? colors.action : colors.disabled }]}
+          icon={() => (
+            <Ionicons name="volume-medium" size={24} color={colors.white} />
+          )}
+          style={[
+            styles.speakBtn,
+            {
+              backgroundColor: text.trim() ? colors.action : colors.disabled,
+            },
+          ]}
           labelStyle={[styles.speakBtnText, { fontFamily: Fonts.arabic.bold }]}
           buttonColor={text.trim() ? colors.action : colors.disabled}
         >

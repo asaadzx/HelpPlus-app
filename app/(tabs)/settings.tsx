@@ -1,21 +1,41 @@
 import { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, View, RefreshControl } from 'react-native';
-import { TextInput, Button, Switch, Card, Text, Avatar, Chip, IconButton, Surface } from 'react-native-paper';
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  RefreshControl,
+} from 'react-native';
+import {
+  TextInput,
+  Button,
+  Switch,
+  Card,
+  Text,
+  Avatar,
+  Chip,
+  IconButton,
+  Surface,
+} from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../src/context/ThemeContext';
 import { Fonts } from '../../constants/theme';
-
-const PRESET_FEEDS = [
-  { label: 'BBC World News', url: 'https://feeds.bbci.co.uk/news/world/rss.xml' },
-  { label: 'NPR News', url: 'https://feeds.npr.org/510333/podcast.xml' },
-  { label: 'Megaphone ESP', url: 'https://feeds.megaphone.fm/ESP5765452710' },
-];
+import { PRESET_FEEDS } from '../../src/data/defaults';
 
 export default function SettingsScreen() {
-  const { colors, isDark, toggleTheme, user, login, logout, updateUser, autoSpeakDelay, setAutoSpeakDelay } = useTheme();
+  const {
+    colors,
+    isDark,
+    toggleTheme,
+    user,
+    login,
+    logout,
+    updateUser,
+    autoSpeakDelay,
+    setAutoSpeakDelay,
+  } = useTheme();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -64,13 +84,51 @@ export default function SettingsScreen() {
     }
   };
 
+  const toggleRssFeed = (url: string) => {
+    const next = rssUrls.includes(url)
+      ? rssUrls.filter((u) => u !== url)
+      : [...rssUrls, url];
+    setRssUrls(next);
+    AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
+  };
+
+  const removeRssFeed = (index: number) => {
+    const next = rssUrls.filter((_, idx) => idx !== index);
+    setRssUrls(next);
+    AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
+  };
+
+  const addCustomFeed = () => {
+    if (newFeedUrl.trim() && !rssUrls.includes(newFeedUrl.trim())) {
+      const next = [...rssUrls, newFeedUrl.trim()];
+      setRssUrls(next);
+      AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
+      setNewFeedUrl('');
+    }
+  };
+
   if (!loggedIn) {
     return (
-      <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.centerContent}>
+      <ScrollView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        contentContainerStyle={styles.centerContent}
+      >
         <Card style={styles.loginCard}>
           <Card.Content style={styles.loginCardContent}>
-            <Avatar.Icon size={64} icon="account-circle" style={{ backgroundColor: colors.primary }} color={colors.white} />
-            <Text style={[styles.loginTitle, { color: colors.text, fontFamily: Fonts.arabic.bold }]}>تسجيل الدخول</Text>
+            <Avatar.Icon
+              size={64}
+              icon="account-circle"
+              style={{ backgroundColor: colors.primary }}
+              color={colors.white}
+            />
+            <Text
+              style={[
+                styles.loginTitle,
+                { color: colors.text, fontFamily: Fonts.arabic.bold },
+              ]}
+            >
+              تسجيل الدخول
+            </Text>
 
             <TextInput
               mode="outlined"
@@ -83,8 +141,15 @@ export default function SettingsScreen() {
               style={styles.input}
               outlineColor={colors.border}
               activeOutlineColor={colors.primary}
-              theme={{ colors: { background: colors.white, onSurfaceVariant: colors.disabled } }}
-              left={<TextInput.Icon icon="email" color={colors.primary} />}
+              theme={{
+                colors: {
+                  background: colors.white,
+                  onSurfaceVariant: colors.disabled,
+                },
+              }}
+              left={
+                <TextInput.Icon icon="email" color={colors.primary} />
+              }
             />
 
             <TextInput
@@ -97,15 +162,25 @@ export default function SettingsScreen() {
               style={styles.input}
               outlineColor={colors.border}
               activeOutlineColor={colors.primary}
-              theme={{ colors: { background: colors.white, onSurfaceVariant: colors.disabled } }}
-              left={<TextInput.Icon icon="lock" color={colors.primary} />}
+              theme={{
+                colors: {
+                  background: colors.white,
+                  onSurfaceVariant: colors.disabled,
+                },
+              }}
+              left={
+                <TextInput.Icon icon="lock" color={colors.primary} />
+              }
             />
 
             <Button
               mode="contained"
               onPress={handleLogin}
               style={styles.loginButton}
-              labelStyle={[styles.loginButtonText, { fontFamily: Fonts.arabic.bold }]}
+              labelStyle={[
+                styles.loginButtonText,
+                { fontFamily: Fonts.arabic.bold },
+              ]}
               buttonColor={colors.primary}
             >
               دخول
@@ -120,14 +195,25 @@ export default function SettingsScreen() {
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.scrollContent}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={[colors.primary]}
+        />
+      }
     >
       <Card style={styles.profileCard} onPress={pickImage}>
         <Card.Content style={styles.profileCardContent}>
           {user?.imageUri ? (
             <Avatar.Image size={88} source={{ uri: user.imageUri }} />
           ) : (
-            <Avatar.Icon size={88} icon="account" style={{ backgroundColor: colors.primary }} color={colors.white} />
+            <Avatar.Icon
+              size={88}
+              icon="account"
+              style={{ backgroundColor: colors.primary }}
+              color={colors.white}
+            />
           )}
           <IconButton
             icon="camera"
@@ -136,33 +222,62 @@ export default function SettingsScreen() {
             style={[styles.cameraBadge, { backgroundColor: colors.secondary }]}
             onPress={pickImage}
           />
-          <Text style={[styles.userName, { color: colors.text, fontFamily: Fonts.arabic.bold }]}>{user?.name || 'مستخدم'}</Text>
-          <Text style={[styles.userEmail, { color: colors.muted, fontFamily: Fonts.english.regular }]}>{user?.email}</Text>
+          <Text
+            style={[
+              styles.userName,
+              { color: colors.text, fontFamily: Fonts.arabic.bold },
+            ]}
+          >
+            {user?.name || 'مستخدم'}
+          </Text>
+          <Text
+            style={[
+              styles.userEmail,
+              { color: colors.muted, fontFamily: Fonts.english.regular },
+            ]}
+          >
+            {user?.email}
+          </Text>
         </Card.Content>
       </Card>
 
       <Surface style={styles.settingRow} elevation={1}>
         <View style={styles.settingLeft}>
-          <Ionicons name={isDark ? 'moon' : 'sunny'} size={22} color={colors.primary} />
-          <Text style={[styles.settingLabel, { color: colors.text, fontFamily: Fonts.arabic.medium }]}>
+          <Ionicons
+            name={isDark ? 'moon' : 'sunny'}
+            size={22}
+            color={colors.primary}
+          />
+          <Text
+            style={[
+              styles.settingLabel,
+              { color: colors.text, fontFamily: Fonts.arabic.medium },
+            ]}
+          >
             الوضع {isDark ? 'الليلي' : 'النهاري'}
           </Text>
         </View>
-        <Switch
-          value={isDark}
-          onValueChange={toggleTheme}
-          color={colors.primary}
-        />
+        <Switch value={isDark} onValueChange={toggleTheme} color={colors.primary} />
       </Surface>
 
       <Surface style={styles.settingRow} elevation={1}>
         <View style={styles.settingContent}>
           <View style={styles.settingLeft}>
             <Ionicons name="timer-outline" size={22} color={colors.primary} />
-            <Text style={[styles.settingLabel, { color: colors.text, fontFamily: Fonts.arabic.medium }]}>
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: colors.text, fontFamily: Fonts.arabic.medium },
+              ]}
+            >
               تأخير النطق التلقائي
             </Text>
-            <Text style={[styles.settingValue, { color: colors.primary, fontFamily: Fonts.english.bold }]}>
+            <Text
+              style={[
+                styles.settingValue,
+                { color: colors.primary, fontFamily: Fonts.english.bold },
+              ]}
+            >
               {autoSpeakDelay}ms
             </Text>
           </View>
@@ -172,8 +287,20 @@ export default function SettingsScreen() {
                 key={ms}
                 selected={autoSpeakDelay === ms}
                 onPress={() => setAutoSpeakDelay(ms)}
-                style={[styles.delayChip, { backgroundColor: autoSpeakDelay === ms ? colors.primary : colors.inputBg }]}
-                textStyle={[styles.delayChipText, { color: autoSpeakDelay === ms ? colors.white : colors.text, fontFamily: Fonts.english.regular }]}
+                style={[
+                  styles.delayChip,
+                  {
+                    backgroundColor:
+                      autoSpeakDelay === ms ? colors.primary : colors.inputBg,
+                  },
+                ]}
+                textStyle={[
+                  styles.delayChipText,
+                  {
+                    color: autoSpeakDelay === ms ? colors.white : colors.text,
+                    fontFamily: Fonts.english.regular,
+                  },
+                ]}
               >
                 {ms}
               </Chip>
@@ -191,7 +318,12 @@ export default function SettingsScreen() {
             style={styles.delayInput}
             outlineColor={colors.border}
             activeOutlineColor={colors.primary}
-            theme={{ colors: { background: colors.inputBg, onSurfaceVariant: colors.disabled } }}
+            theme={{
+              colors: {
+                background: colors.inputBg,
+                onSurfaceVariant: colors.disabled,
+              },
+            }}
           />
         </View>
       </Surface>
@@ -199,7 +331,14 @@ export default function SettingsScreen() {
       <Surface style={styles.settingRow} elevation={1}>
         <View style={styles.settingLeft}>
           <Ionicons name="grid-outline" size={22} color={colors.secondary} />
-          <Text style={[styles.settingLabel, { color: colors.text, fontFamily: Fonts.arabic.medium }]}>إدارة الكروت</Text>
+          <Text
+            style={[
+              styles.settingLabel,
+              { color: colors.text, fontFamily: Fonts.arabic.medium },
+            ]}
+          >
+            إدارة الكروت
+          </Text>
         </View>
         <IconButton
           icon="chevron-right"
@@ -213,26 +352,47 @@ export default function SettingsScreen() {
         <Card.Content>
           <View style={styles.sectionHeader}>
             <Ionicons name="newspaper-outline" size={22} color={colors.primary} />
-            <Text style={[styles.settingLabel, { color: colors.text, fontFamily: Fonts.arabic.bold }]}>مصادر الأخبار (RSS)</Text>
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: colors.text, fontFamily: Fonts.arabic.bold },
+              ]}
+            >
+              مصادر الأخبار (RSS)
+            </Text>
           </View>
 
           {rssUrls.map((url, i) => (
-            <View key={i} style={[styles.feedRow, { borderBottomColor: colors.border }]}>
-              <Text style={[styles.feedUrl, { color: colors.text, fontFamily: Fonts.english.regular }]} numberOfLines={1}>{url}</Text>
+            <View
+              key={i}
+              style={[styles.feedRow, { borderBottomColor: colors.border }]}
+            >
+              <Text
+                style={[
+                  styles.feedUrl,
+                  { color: colors.text, fontFamily: Fonts.english.regular },
+                ]}
+                numberOfLines={1}
+              >
+                {url}
+              </Text>
               <IconButton
                 icon="close-circle"
                 size={20}
                 iconColor={colors.emergency}
-                onPress={() => {
-                  const next = rssUrls.filter((_, idx) => idx !== i);
-                  setRssUrls(next);
-                  AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
-                }}
+                onPress={() => removeRssFeed(i)}
               />
             </View>
           ))}
 
-          <Text style={[styles.presetLabel, { color: colors.muted, fontFamily: Fonts.arabic.medium }]}>أضف من القائمة:</Text>
+          <Text
+            style={[
+              styles.presetLabel,
+              { color: colors.muted, fontFamily: Fonts.arabic.medium },
+            ]}
+          >
+            أضف من القائمة:
+          </Text>
           <View style={styles.presetGrid}>
             {PRESET_FEEDS.map((preset) => {
               const added = rssUrls.includes(preset.url);
@@ -240,19 +400,22 @@ export default function SettingsScreen() {
                 <Chip
                   key={preset.url}
                   selected={added}
-                  onPress={() => {
-                    if (added) {
-                      const next = rssUrls.filter((u) => u !== preset.url);
-                      setRssUrls(next);
-                      AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
-                    } else {
-                      const next = [...rssUrls, preset.url];
-                      setRssUrls(next);
-                      AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
-                    }
-                  }}
-                  style={[styles.presetChip, { backgroundColor: added ? colors.action : colors.inputBg }]}
-                  textStyle={[styles.presetChipText, { color: added ? colors.white : colors.text, fontFamily: Fonts.english.regular }]}
+                  onPress={() => toggleRssFeed(preset.url)}
+                  style={[
+                    styles.presetChip,
+                    {
+                      backgroundColor: added
+                        ? colors.action
+                        : colors.inputBg,
+                    },
+                  ]}
+                  textStyle={[
+                    styles.presetChipText,
+                    {
+                      color: added ? colors.white : colors.text,
+                      fontFamily: Fonts.english.regular,
+                    },
+                  ]}
                 >
                   {preset.label}
                 </Chip>
@@ -260,7 +423,14 @@ export default function SettingsScreen() {
             })}
           </View>
 
-          <Text style={[styles.presetLabel, { color: colors.muted, fontFamily: Fonts.arabic.medium }]}>أضف رابط مخصص:</Text>
+          <Text
+            style={[
+              styles.presetLabel,
+              { color: colors.muted, fontFamily: Fonts.arabic.medium },
+            ]}
+          >
+            أضف رابط مخصص:
+          </Text>
           <View style={styles.customFeedRow}>
             <TextInput
               mode="outlined"
@@ -272,19 +442,17 @@ export default function SettingsScreen() {
               style={styles.customFeedInput}
               outlineColor={colors.border}
               activeOutlineColor={colors.primary}
-              theme={{ colors: { background: colors.inputBg, onSurfaceVariant: colors.disabled } }}
+              theme={{
+                colors: {
+                  background: colors.inputBg,
+                  onSurfaceVariant: colors.disabled,
+                },
+              }}
             />
             <IconButton
               icon="plus"
               mode="contained"
-              onPress={() => {
-                if (newFeedUrl.trim() && !rssUrls.includes(newFeedUrl.trim())) {
-                  const next = [...rssUrls, newFeedUrl.trim()];
-                  setRssUrls(next);
-                  AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
-                  setNewFeedUrl('');
-                }
-              }}
+              onPress={addCustomFeed}
               style={styles.addFeedBtn}
               iconColor={colors.white}
               containerColor={colors.primary}
@@ -296,7 +464,14 @@ export default function SettingsScreen() {
       <Surface style={styles.settingRow} elevation={1}>
         <View style={styles.settingLeft}>
           <Ionicons name="log-out-outline" size={22} color={colors.emergency} />
-          <Text style={[styles.settingLabel, { color: colors.emergency, fontFamily: Fonts.arabic.medium }]}>تسجيل الخروج</Text>
+          <Text
+            style={[
+              styles.settingLabel,
+              { color: colors.emergency, fontFamily: Fonts.arabic.medium },
+            ]}
+          >
+            تسجيل الخروج
+          </Text>
         </View>
         <IconButton
           icon="logout"
@@ -320,7 +495,12 @@ const styles = StyleSheet.create({
   loginCardContent: {
     gap: 4,
   },
-  loginTitle: { fontSize: 22, textAlign: 'center', marginTop: 8, marginBottom: 16 },
+  loginTitle: {
+    fontSize: 22,
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 16,
+  },
   input: {
     marginBottom: 12,
   },
@@ -359,8 +539,19 @@ const styles = StyleSheet.create({
   settingLabel: { fontSize: 16 },
   settingValue: { fontSize: 16, marginLeft: 'auto' },
   sectionBox: { borderRadius: 12, marginBottom: 12 },
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
-  feedRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 1 },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+  feedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+  },
   feedUrl: { flex: 1, marginRight: 8, fontSize: 12 },
   presetLabel: { fontSize: 13, marginTop: 12, marginBottom: 8 },
   presetGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },

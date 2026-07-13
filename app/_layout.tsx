@@ -71,6 +71,15 @@ function RootLayoutInner() {
   );
 }
 
+function PaperProviderWrapper() {
+  const { paperTheme } = useTheme();
+  return (
+    <PaperProvider theme={paperTheme}>
+      <RootLayoutInner />
+    </PaperProvider>
+  );
+}
+
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
@@ -78,14 +87,5 @@ export default function RootLayout() {
         <PaperProviderWrapper />
       </ThemeProvider>
     </SafeAreaProvider>
-  );
-}
-
-function PaperProviderWrapper() {
-  const { paperTheme } = useTheme();
-  return (
-    <PaperProvider theme={paperTheme}>
-      <RootLayoutInner />
-    </PaperProvider>
   );
 }
