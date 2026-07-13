@@ -18,11 +18,13 @@ import {
   Fredoka_700Bold,
 } from '@expo-google-fonts/fredoka';
 import { ThemeProvider, useTheme } from '../src/context/ThemeContext';
+import { LanguageProvider, useLanguage } from '../src/i18n';
 
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutInner() {
   const { colors } = useTheme();
+  const { t } = useLanguage();
   const [fontsLoaded] = useFonts({
     Tajawal_400Regular,
     Tajawal_500Medium,
@@ -55,14 +57,14 @@ function RootLayoutInner() {
         <Stack.Screen
           name="add-tile"
           options={{
-            title: 'إضافة كرت جديد',
+            title: t('layout.addTile'),
             presentation: 'modal',
           }}
         />
         <Stack.Screen
           name="manage-tiles"
           options={{
-            title: 'إدارة الكروت',
+            title: t('layout.manageTiles'),
             presentation: 'modal',
           }}
         />
@@ -83,9 +85,11 @@ function PaperProviderWrapper() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
-        <PaperProviderWrapper />
-      </ThemeProvider>
+      <LanguageProvider>
+        <ThemeProvider>
+          <PaperProviderWrapper />
+        </ThemeProvider>
+      </LanguageProvider>
     </SafeAreaProvider>
   );
 }
