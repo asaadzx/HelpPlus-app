@@ -22,7 +22,7 @@ const CARD_HEIGHT = CARD_WIDTH * 1.05;
 
 export default function SmartDashboard() {
   const { colors, user, autoSpeakDelay } = useTheme();
-  const { language, t, isRTL } = useLanguage();
+  const { language, t } = useLanguage();
   const router = useRouter();
   const params = useLocalSearchParams<{ newTile?: string }>();
   const [cards, setCards] = useState<PhraseCard[]>(DEFAULT_CARDS);
