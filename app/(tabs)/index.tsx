@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { StyleSheet, View, Dimensions, FlatList, RefreshControl } from 'react-native';
 import { Surface, Text, IconButton, TouchableRipple } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../src/context/ThemeContext';
 import { useLanguage } from '../../src/i18n';
@@ -24,41 +25,27 @@ export default function SmartDashboard() {
   const { colors, user, autoSpeakDelay } = useTheme();
   const { language, t } = useLanguage();
   const router = useRouter();
-  const params = useLocalSearchParams<{ newTile?: string }>();
   const [cards, setCards] = useState<PhraseCard[]>(DEFAULT_CARDS);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    loadCards();
-  }, []);
-
-  useEffect(() => {
-    if (params.newTile) {
-      try {
-        const newTile = JSON.parse(params.newTile);
-        const card: PhraseCard = { id: Date.now().toString(), ...newTile };
-        setCards((prev) => {
-          const next = [...prev, card];
-          const custom = next.filter(
-            (c) => !DEFAULT_CARDS.find((d) => d.id === c.id),
-          );
-          AsyncStorage.setItem('customCards', JSON.stringify(custom));
-          return next;
-        });
-      } catch {
-        // Invalid JSON from navigation params — ignore
-      }
-    }
-  }, [params.newTile]);
-
   const loadCards = async () => {
-    const saved = await AsyncStorage.getItem('customCards');
-    if (saved) {
-      setCards([...DEFAULT_CARDS, ...JSON.parse(saved)]);
-    } else {
+    try {
+      const saved = await AsyncStorage.getItem('customCards');
+      if (saved) {
+        setCards([...DEFAULT_CARDS, ...JSON.parse(saved)]);
+      } else {
+        setCards([...DEFAULT_CARDS]);
+      }
+    } catch {
       setCards([...DEFAULT_CARDS]);
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadCards();
+    }, [])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -67,13 +54,18 @@ export default function SmartDashboard() {
   };
 
   const onTilePress = (card: PhraseCard) => {
-    const text = language === 'ar' ? card.labelAr : card.labelEn;
+    const text = language === 'ar' ? (card.labelAr || card.labelEn) : (card.labelEn || card.labelAr);
+    if (!text) return;
     setTimeout(() => {
-      Speech.speak(text, { language: language === 'ar' ? 'ar' : 'en', pitch: 1.0, rate: 0.85 });
+      try {
+        Speech.speak(text, { language: language === 'ar' ? 'ar' : 'en', pitch: 1.0, rate: 0.85 });
+      } catch {}
     }, autoSpeakDelay);
   };
 
   const renderTile = ({ item }: { item: PhraseCard }) => {
+    const primaryText = language === 'ar' ? (item.labelAr || item.labelEn || '') : (item.labelEn || item.labelAr || '');
+    const secondaryText = language === 'ar' ? (item.labelEn || '') : (item.labelAr || '');
     return (
       <TouchableRipple
         key={item.id}
@@ -93,16 +85,18 @@ export default function SmartDashboard() {
               { color: '#1A3038', fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
             ]}
           >
-            {language === 'ar' ? item.labelAr : item.labelEn}
+            {primaryText}
           </Text>
-          <Text
-            style={[
-              styles.tileTextSecondary,
-              { color: '#4A5568', fontFamily: language === 'ar' ? Fonts.english.regular : Fonts.arabic.regular },
-            ]}
-          >
-            {language === 'ar' ? item.labelEn : item.labelAr}
-          </Text>
+          {secondaryText ? (
+            <Text
+              style={[
+                styles.tileTextSecondary,
+                { color: '#4A5568', fontFamily: language === 'ar' ? Fonts.english.regular : Fonts.arabic.regular },
+              ]}
+            >
+              {secondaryText}
+            </Text>
+          ) : null}
         </Surface>
       </TouchableRipple>
     );
@@ -130,31 +124,33 @@ export default function SmartDashboard() {
                 icon="checkmark-circle"
                 bg={colors.action}
                 textColor="#FFFFFF"
-                onPress={() => Speech.speak(t('home.ribbon.yes'), { language: language === 'ar' ? 'ar' : 'en' })}
+                onPress={() => { try { Speech.speak(t('home.ribbon.yes'), { language: language === 'ar' ? 'ar' : 'en' }); } catch {} }}
               />
               <QuickRibbon
                 label={t('home.ribbon.no')}
                 icon="close-circle"
                 bg={colors.emergency}
                 textColor="#FFFFFF"
-                onPress={() => Speech.speak(t('home.ribbon.no'), { language: language === 'ar' ? 'ar' : 'en' })}
+                onPress={() => { try { Speech.speak(t('home.ribbon.no'), { language: language === 'ar' ? 'ar' : 'en' }); } catch {} }}
               />
               <QuickRibbon
                 label={t('home.ribbon.thanks')}
                 bg={colors.primary}
                 textColor="#FFFFFF"
-                onPress={() => Speech.speak(t('home.ribbon.thanks'), { language: language === 'ar' ? 'ar' : 'en' })}
+                onPress={() => { try { Speech.speak(t('home.ribbon.thanks'), { language: language === 'ar' ? 'ar' : 'en' }); } catch {} }}
               />
               <QuickRibbon
                 label={t('home.ribbon.help')}
                 icon="alert-circle"
                 bg={colors.secondary}
                 textColor={colors.text}
-                onPress={() =>
-                  Speech.speak(t('home.ribbon.helpPhrase'), {
-                    language: language === 'ar' ? 'ar' : 'en',
-                  })
-                }
+                onPress={() => {
+                  try {
+                    Speech.speak(t('home.ribbon.helpPhrase'), {
+                      language: language === 'ar' ? 'ar' : 'en',
+                    });
+                  } catch {}
+                }}
               />
             </View>
           </View>

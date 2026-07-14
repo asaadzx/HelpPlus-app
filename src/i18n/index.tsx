@@ -27,12 +27,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      const saved = await AsyncStorage.getItem('language');
-      if (saved === 'ar' || saved === 'en') {
-        setLanguageState(saved);
-        const isRTL = saved === 'ar';
-        I18nManager.allowRTL(isRTL);
-        I18nManager.forceRTL(isRTL);
+      try {
+        const saved = await AsyncStorage.getItem('language');
+        if (saved === 'ar' || saved === 'en') {
+          setLanguageState(saved);
+          const isRTL = saved === 'ar';
+          I18nManager.allowRTL(isRTL);
+          I18nManager.forceRTL(isRTL);
+        }
+      } catch {
+        // corrupted storage — keep default Arabic
       }
       setLoaded(true);
     })();
@@ -40,10 +44,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = async (lang: Language) => {
     setLanguageState(lang);
-    await AsyncStorage.setItem('language', lang);
     const isRTL = lang === 'ar';
     I18nManager.allowRTL(isRTL);
     I18nManager.forceRTL(isRTL);
+    try {
+      await AsyncStorage.setItem('language', lang);
+    } catch {
+      // storage write failed — state already updated
+    }
   };
 
   const t = (key: string): string => {

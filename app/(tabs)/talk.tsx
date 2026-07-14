@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { TextInput, Button, Chip, Surface } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,6 +11,11 @@ export default function TalkScreen() {
   const { colors, autoSpeakDelay } = useTheme();
   const { language, t } = useLanguage();
   const [text, setText] = useState('');
+  const prevLenRef = useRef(0);
+
+  useEffect(() => {
+    prevLenRef.current = text.length;
+  }, [text]);
 
   const quickPhrases = [
     t('talk.quickPhrases.yes'),
@@ -23,16 +28,22 @@ export default function TalkScreen() {
 
   const speak = () => {
     if (!text.trim()) return;
-    Speech.speak(text, { language: language === 'ar' ? 'ar' : 'en', pitch: 1.0, rate: 0.85 });
+    try {
+      Speech.speak(text, { language: language === 'ar' ? 'ar' : 'en', pitch: 1.0, rate: 0.85 });
+    } catch {}
   };
 
   const handleTextChange = (value: string) => {
+    const isAdding = value.length > prevLenRef.current;
     setText(value);
-    if (value.trim().length > 0 && value.endsWith(' ')) {
+    prevLenRef.current = value.length;
+    if (isAdding && value.trim().length > 0 && value.endsWith(' ')) {
       const words = value.trim().split(' ');
       const lastWord = words[words.length - 1];
       setTimeout(() => {
-        Speech.speak(lastWord, { language: language === 'ar' ? 'ar' : 'en', pitch: 1.0, rate: 0.85 });
+        try {
+          Speech.speak(lastWord, { language: language === 'ar' ? 'ar' : 'en', pitch: 1.0, rate: 0.85 });
+        } catch {}
       }, autoSpeakDelay);
     }
   };

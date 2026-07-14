@@ -48,15 +48,23 @@ export default function EntertainmentHub() {
 
   useEffect(() => {
     (async () => {
-      const saved = await AsyncStorage.getItem('rssFeeds');
-      if (saved) setRssUrls(JSON.parse(saved));
+      try {
+        const saved = await AsyncStorage.getItem('rssFeeds');
+        if (saved) setRssUrls(JSON.parse(saved));
+      } catch {
+        // corrupted storage — keep empty
+      }
     })();
   }, []);
 
   useEffect(() => {
     (async () => {
-      const cached = await AsyncStorage.getItem('rssFeedsCache');
-      if (cached) setFeeds(JSON.parse(cached));
+      try {
+        const cached = await AsyncStorage.getItem('rssFeedsCache');
+        if (cached) setFeeds(JSON.parse(cached));
+      } catch {
+        // corrupted cache — will refetch
+      }
     })();
   }, []);
 
@@ -85,7 +93,11 @@ export default function EntertainmentHub() {
           b.pubDate > a.pubDate ? 1 : -1,
         );
         setFeeds(sorted);
-        AsyncStorage.setItem('rssFeedsCache', JSON.stringify(sorted));
+        try {
+          await AsyncStorage.setItem('rssFeedsCache', JSON.stringify(sorted));
+        } catch {
+          // cache write failed — feeds still in memory
+        }
       } catch {
         // Network or parsing error — silently ignore, cache stays
       }
@@ -112,13 +124,17 @@ export default function EntertainmentHub() {
     const q = TRIVIA_QUESTIONS[currentTrivia];
     if (index === q.correctIndex) {
       setScore((s) => s + 1);
-      Speech.speak(t('entertainment.correctAnswer'), { language: language === 'ar' ? 'ar' : 'en' });
+      try {
+        Speech.speak(t('entertainment.correctAnswer'), { language: language === 'ar' ? 'ar' : 'en' });
+      } catch {}
     } else {
       const correctOption = language === 'ar' ? q.options[q.correctIndex] : q.optionsEn[q.correctIndex];
-      Speech.speak(
-        `${t('entertainment.correctAnswerIs')} ${correctOption}`,
-        { language: language === 'ar' ? 'ar' : 'en' },
-      );
+      try {
+        Speech.speak(
+          `${t('entertainment.correctAnswerIs')} ${correctOption}`,
+          { language: language === 'ar' ? 'ar' : 'en' },
+        );
+      } catch {}
     }
   };
 
@@ -317,12 +333,14 @@ function NewsTab({
               ) : null}
               <Button
                 mode="text"
-                onPress={() =>
-                  Speech.speak(`${item.title}. ${item.description}`, {
-                    language: language === 'ar' ? 'ar' : 'en',
-                    rate: 0.85,
-                  })
-                }
+                onPress={() => {
+                  try {
+                    Speech.speak(`${item.title}. ${item.description}`, {
+                      language: language === 'ar' ? 'ar' : 'en',
+                      rate: 0.85,
+                    });
+                  } catch {}
+                }}
                 style={styles.speakNewsBtn}
                 labelStyle={{ color: colors.primary }}
                 icon="volume-high"
@@ -412,7 +430,7 @@ function TriviaTab({
             icon="volume-high"
             size={22}
             iconColor={colors.primary}
-            onPress={() => Speech.speak(questionText, { language: language === 'ar' ? 'ar' : 'en' })}
+            onPress={() => { try { Speech.speak(questionText, { language: language === 'ar' ? 'ar' : 'en' }); } catch {} }}
             style={styles.speakerBtn}
           />
           <Text

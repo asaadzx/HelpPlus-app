@@ -60,6 +60,8 @@
   "addTile.icon": "أيقونة",
   "addTile.color": "لون",
   "addTile.add": "إضافة",
+  "addTile.errorTitle": "نص مفقود",
+  "addTile.errorNeedText": "يرجى إدخال نص بالعربية أو الإنجليزية (أو كليهما).",
   "manageTiles.protected": "الكروت الأساسية محمية ولا يمكن حذفها",
   "manageTiles.deleteWarning": "تنبيه",
   "manageTiles.cannotDelete": "لا يمكن حذف الكروت الأساسية",

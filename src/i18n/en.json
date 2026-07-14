@@ -60,6 +60,8 @@
   "addTile.icon": "Icon",
   "addTile.color": "Color",
   "addTile.add": "Add",
+  "addTile.errorTitle": "Missing Text",
+  "addTile.errorNeedText": "Please enter text in Arabic or English (or both).",
   "manageTiles.protected": "Default cards are protected and cannot be deleted",
   "manageTiles.deleteWarning": "Warning",
   "manageTiles.cannotDelete": "Cannot delete default cards",

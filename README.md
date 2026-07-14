@@ -43,7 +43,8 @@ HelpPlus (معًا — "Together") is a communication aid designed for stroke pa
 - **Smart Dashboard** — 2-column tile grid with instant Arabic text-to-speech on tap
 - **Quick Actions** — one-tap buttons for common phrases: yes, no, thanks, help
 - **Type to Talk** — free typing with auto-speak on spacebar + quick phrase pills
-- **Custom Tiles** — create your own cards with Arabic + English text, icons, and colors
+- **Custom Tiles** — create your own cards with Arabic, English, or both — icons and colors included
+- **Single-Language Cards** — add cards with text in one language only (Arabic or English)
 
 ### Entertainment
 - **News Reader** — RSS feed reader with cached articles for instant display
@@ -51,6 +52,7 @@ HelpPlus (معًا — "Together") is a communication aid designed for stroke pa
 
 ### Settings & Customization
 - **Dark / Light Mode** — full theme toggle with accessibility-focused colors
+- **Language Selector** — switch between Arabic and English, placed next to theme toggle
 - **Auto-Speak Delay** — configurable 10ms–500ms delay (default 70ms)
 - **RSS Feed Management** — add/remove custom RSS sources
 - **Profile Image** — pick and display a profile photo
@@ -130,11 +132,37 @@ app/
 ├── manage-tiles.tsx         # Delete custom tiles
 └── _layout.tsx              # Root layout + providers
 src/
-└── context/
-    └── ThemeContext.tsx      # Theme + auth state
+├── context/
+│   └── ThemeContext.tsx      # Theme + auth + autoSpeakDelay
+├── i18n/
+│   ├── index.tsx            # LanguageContext + t() translator
+│   ├── ar.json              # Arabic translations
+│   └── en.json              # English translations
+├── types/
+│   └── index.ts             # PhraseCard, FeedItem, TriviaQuestion, User
+├── data/
+│   └── defaults.ts          # DEFAULT_CARDS, TRIVIA_QUESTIONS, PRESET_FEEDS
+└── utils/
+    ├── icons.tsx             # renderIcon helper
+    └── rss.ts                # RSS XML parser
 constants/
-└── theme.ts                 # Colors, fonts, Paper theme
+└── theme.ts                  # Colors, fonts, Paper theme, presets
 ```
+
+---
+
+## Production Readiness
+
+| Priority | Task | Status |
+|----------|------|--------|
+| HIGH | Wrap all AsyncStorage + JSON.parse in try/catch (20+ unguarded calls) | ✅ |
+| HIGH | Add integration tests (card CRUD, ThemeContext, LanguageContext) | ✅ |
+| MEDIUM | Delete 12 unused Expo boilerplate files (~270 dead lines) | ✅ |
+| MEDIUM | Move jest/testing deps from `dependencies` → `devDependencies` | ✅ |
+| MEDIUM | Enhance ESLint (`no-unused-vars`, `no-console`, expanded ignores) | ✅ |
+| MEDIUM | Wrap `Speech.speak` + `ImagePicker` in try/catch (8+ calls) | ✅ |
+| MEDIUM | Add ThemeContext unit tests (toggle, login, autoSpeakDelay) | ✅ |
+| LOW | Add parseRSS unit tests | ✅ |
 
 ---
 

@@ -50,14 +50,24 @@ export default function SettingsScreen() {
   const [rssUrls, setRssUrls] = useState<string[]>([]);
   const [newFeedUrl, setNewFeedUrl] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [langVisible, setLangVisible] = useState(false);
+
+  const languages: { code: Language; label: string; nativeName: string }[] = [
+    { code: 'ar', label: 'Arabic', nativeName: 'العربية' },
+    { code: 'en', label: 'English', nativeName: 'English' },
+  ];
 
   useEffect(() => {
     loadRss();
   }, []);
 
   const loadRss = async () => {
-    const saved = await AsyncStorage.getItem('rssFeeds');
-    if (saved) setRssUrls(JSON.parse(saved));
+    try {
+      const saved = await AsyncStorage.getItem('rssFeeds');
+      if (saved) setRssUrls(JSON.parse(saved));
+    } catch {
+      // corrupted storage — keep empty
+    }
   };
 
   const onRefresh = async () => {
@@ -80,37 +90,53 @@ export default function SettingsScreen() {
   };
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
-    if (!result.canceled && result.assets[0]) {
-      updateUser({ imageUri: result.assets[0].uri });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+      });
+      if (!result.canceled && result.assets[0]) {
+        updateUser({ imageUri: result.assets[0].uri });
+      }
+    } catch {
+      // permission denied or picker failed
     }
   };
 
-  const toggleRssFeed = (url: string) => {
+  const toggleRssFeed = async (url: string) => {
     const next = rssUrls.includes(url)
       ? rssUrls.filter((u) => u !== url)
       : [...rssUrls, url];
     setRssUrls(next);
-    AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
+    try {
+      await AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
+    } catch {
+      // storage write failed — state already updated
+    }
   };
 
-  const removeRssFeed = (index: number) => {
+  const removeRssFeed = async (index: number) => {
     const next = rssUrls.filter((_, idx) => idx !== index);
     setRssUrls(next);
-    AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
+    try {
+      await AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
+    } catch {
+      // storage write failed — state already updated
+    }
   };
 
-  const addCustomFeed = () => {
+  const addCustomFeed = async () => {
     if (newFeedUrl.trim() && !rssUrls.includes(newFeedUrl.trim())) {
       const next = [...rssUrls, newFeedUrl.trim()];
       setRssUrls(next);
-      AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
       setNewFeedUrl('');
+      try {
+        await AsyncStorage.setItem('rssFeeds', JSON.stringify(next));
+      } catch {
+        // storage write failed — state already updated
+      }
     }
   };
 
@@ -250,22 +276,75 @@ export default function SettingsScreen() {
       </Card>
 
       <Surface style={styles.settingRow} elevation={1}>
-        <View style={styles.settingLeft}>
-          <Ionicons
-            name={isDark ? 'moon' : 'sunny'}
-            size={22}
-            color={colors.primary}
-          />
-          <Text
-            style={[
-              styles.settingLabel,
-              { color: colors.text, fontFamily: Fonts.arabic.medium },
-            ]}
-          >
-            {isDark ? t('settings.themeNight') : t('settings.themeDay')}
-          </Text>
+        <View style={styles.dualSettingRow}>
+          <View style={styles.dualSettingLeft}>
+            <Ionicons
+              name={isDark ? 'moon' : 'sunny'}
+              size={22}
+              color={colors.primary}
+            />
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: colors.text, fontFamily: Fonts.arabic.medium },
+              ]}
+            >
+              {isDark ? t('settings.themeNight') : t('settings.themeDay')}
+            </Text>
+          </View>
+          <Switch value={isDark} onValueChange={toggleTheme} color={colors.primary} />
         </View>
-        <Switch value={isDark} onValueChange={toggleTheme} color={colors.primary} />
+      </Surface>
+
+      <Surface style={styles.settingRow} elevation={1}>
+        <View style={styles.dualSettingRow}>
+          <View style={styles.dualSettingLeft}>
+            <Ionicons name="language" size={22} color={colors.primary} />
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.medium : Fonts.english.medium },
+              ]}
+            >
+              {t('settings.language')}
+            </Text>
+          </View>
+          <Menu
+            visible={langVisible}
+            onDismiss={() => setLangVisible(false)}
+            anchor={
+              <Button mode="outlined" onPress={() => setLangVisible(true)} style={styles.languageBtn}>
+                {languages.find((l) => l.code === language)?.nativeName}
+              </Button>
+            }
+          >
+            {languages.map((lang) => (
+              <Menu.Item
+                key={lang.code}
+                onPress={() => {
+                  setLangVisible(false);
+                  if (lang.code === language) return;
+                  setLanguage(lang.code);
+                  Alert.alert(
+                    t('dialog.restartTitle'),
+                    t('dialog.restartMessage'),
+                    [
+                      { text: t('dialog.cancel'), style: 'cancel' },
+                      {
+                        text: t('dialog.restart'),
+                        onPress: async () => {
+                          try { await Updates.reloadAsync(); } catch {}
+                        },
+                      },
+                    ],
+                  );
+                }}
+                title={lang.nativeName}
+                leadingIcon={lang.code === language ? 'check' : undefined}
+              />
+            ))}
+          </Menu>
+        </View>
       </Surface>
 
       <Surface style={styles.settingRow} elevation={1}>
@@ -563,7 +642,12 @@ function LanguageSelector({
       t('dialog.restartMessage'),
       [
         { text: t('dialog.cancel'), style: 'cancel' },
-        { text: t('dialog.restart'), onPress: () => Updates.reloadAsync() },
+        {
+          text: t('dialog.restart'),
+          onPress: async () => {
+            try { await Updates.reloadAsync(); } catch {}
+          },
+        },
       ],
     );
   };
@@ -650,6 +734,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   settingLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  dualSettingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dualSettingLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   settingLabel: { fontSize: 16 },
   settingValue: { fontSize: 16, marginLeft: 'auto' },
   sectionBox: { borderRadius: 12, marginBottom: 12 },

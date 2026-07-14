@@ -4,8 +4,8 @@ export type IconProvider = 'Ionicons' | 'MaterialCommunityIcons';
 
 export interface PhraseCard {
   id: string;
-  labelAr: string;
-  labelEn: string;
+  labelAr?: string;
+  labelEn?: string;
   icon: string;
   iconProvider: IconProvider;
   color: string;

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, View, TouchableOpacity, Alert } from 'react-native';
 import { TextInput, Button, Chip, Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../src/context/ThemeContext';
 import { useLanguage } from '../src/i18n';
 import { Fonts, ICON_PRESETS, COLOR_PRESETS, TILE_PRESETS } from '../constants/theme';
@@ -16,29 +17,42 @@ export default function AddTileScreen() {
   const [selectedIcon, setSelectedIcon] = useState(ICON_PRESETS[0]);
   const [selectedColor, setSelectedColor] = useState(COLOR_PRESETS[0]);
 
-  const handleAdd = () => {
-    if (!labelAr.trim()) return;
-    router.dismiss();
-    router.push({
-      pathname: '/',
-      params: {
-        newTile: JSON.stringify({
-          labelAr,
-          labelEn,
-          icon: selectedIcon.name,
-          iconProvider: selectedIcon.provider,
-          color: selectedColor,
-        }),
-      },
-    });
+  const handleAdd = async () => {
+    if (!labelAr.trim() && !labelEn.trim()) {
+      Alert.alert(t('addTile.errorTitle'), t('addTile.errorNeedText'));
+      return;
+    }
+    const card = {
+      id: Date.now().toString() + Math.random().toString(36).slice(2, 7),
+      labelAr: labelAr.trim(),
+      labelEn: labelEn.trim(),
+      icon: selectedIcon.name,
+      iconProvider: selectedIcon.provider,
+      color: selectedColor,
+    };
+    try {
+      const saved = await AsyncStorage.getItem('customCards');
+      const existing = saved ? JSON.parse(saved) : [];
+      await AsyncStorage.setItem('customCards', JSON.stringify([...existing, card]));
+    } catch {
+      // storage write failed — card still created locally
+    }
+    router.back();
   };
 
-  const handleQuickAdd = (preset: (typeof TILE_PRESETS)[0]) => {
-    router.dismiss();
-    router.push({
-      pathname: '/',
-      params: { newTile: JSON.stringify(preset) },
-    });
+  const handleQuickAdd = async (preset: (typeof TILE_PRESETS)[0]) => {
+    const card = {
+      id: Date.now().toString() + Math.random().toString(36).slice(2, 7),
+      ...preset,
+    };
+    try {
+      const saved = await AsyncStorage.getItem('customCards');
+      const existing = saved ? JSON.parse(saved) : [];
+      await AsyncStorage.setItem('customCards', JSON.stringify([...existing, card]));
+    } catch {
+      // storage write failed — card still created locally
+    }
+    router.back();
   };
 
   return (

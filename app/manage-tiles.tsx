@@ -26,12 +26,16 @@ export default function ManageTilesScreen() {
   }, []);
 
   const loadCards = async () => {
-    const saved = await AsyncStorage.getItem('customCards');
-    const custom = saved ? JSON.parse(saved) : [];
-    setCards([
-      ...DEFAULT_CARDS,
-      ...custom.map((c: PhraseCard) => ({ ...c, isDefault: false })),
-    ]);
+    try {
+      const saved = await AsyncStorage.getItem('customCards');
+      const custom = saved ? JSON.parse(saved) : [];
+      setCards([
+        ...DEFAULT_CARDS,
+        ...custom.map((c: PhraseCard) => ({ ...c, isDefault: false })),
+      ]);
+    } catch {
+      setCards([...DEFAULT_CARDS]);
+    }
   };
 
   const onRefresh = async () => {
@@ -47,7 +51,7 @@ export default function ManageTilesScreen() {
       return;
     }
 
-    Alert.alert(t('manageTiles.deleteTitle'), `${t('manageTiles.deleteMessage')} "${language === 'ar' ? card?.labelAr : card?.labelEn}"?`, [
+    Alert.alert(t('manageTiles.deleteTitle'), `${t('manageTiles.deleteMessage')} "${language === 'ar' ? (card?.labelAr || card?.labelEn) : (card?.labelEn || card?.labelAr)}"?`, [
       { text: t('manageTiles.deleteCancel'), style: 'cancel' },
       {
         text: t('manageTiles.deleteConfirm'),
@@ -56,16 +60,22 @@ export default function ManageTilesScreen() {
           const next = cards.filter((c) => c.id !== id);
           setCards(next);
           const customOnly = next.filter((c) => !c.isDefault);
-          await AsyncStorage.setItem(
-            'customCards',
-            JSON.stringify(customOnly),
-          );
+          try {
+            await AsyncStorage.setItem(
+              'customCards',
+              JSON.stringify(customOnly),
+            );
+          } catch {
+            // storage write failed — state already updated
+          }
         },
       },
     ]);
   };
 
   const renderItem = ({ item }: { item: PhraseCard }) => {
+    const primaryText = language === 'ar' ? (item.labelAr || item.labelEn || '') : (item.labelEn || item.labelAr || '');
+    const secondaryText = language === 'ar' ? (item.labelEn || '') : (item.labelAr || '');
     return (
       <Surface style={styles.row} elevation={1}>
         <View style={styles.rowLeft}>
@@ -81,16 +91,18 @@ export default function ManageTilesScreen() {
                 { color: colors.text, fontFamily: language === 'ar' ? Fonts.arabic.bold : Fonts.english.bold },
               ]}
             >
-              {language === 'ar' ? item.labelAr : item.labelEn}
+              {primaryText}
             </Text>
-            <Text
-              style={[
-                styles.labelEn,
-                { color: colors.muted, fontFamily: language === 'ar' ? Fonts.english.regular : Fonts.arabic.regular },
-              ]}
-            >
-              {language === 'ar' ? item.labelEn : item.labelAr}
-            </Text>
+            {secondaryText ? (
+              <Text
+                style={[
+                  styles.labelEn,
+                  { color: colors.muted, fontFamily: language === 'ar' ? Fonts.english.regular : Fonts.arabic.regular },
+                ]}
+              >
+                {secondaryText}
+              </Text>
+            ) : null}
           </View>
         </View>
         {!item.isDefault ? (
